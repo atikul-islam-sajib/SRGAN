@@ -10,7 +10,38 @@ from utils import params
 
 
 class MiddleBlock(nn.Module):
+    """
+    A neural network module designed as a middle block for a generator network (netG), implementing a convolutional
+    layer followed by batch normalization.
+
+    This module is structured to support skip connections, enabling the addition of input with another tensor
+    before passing it through subsequent layers, thus allowing for features reusability and deeper network training
+    without vanishing gradient issues.
+
+    Attributes:
+        in_channels (int): The number of input channels.
+        out_channels (int): The number of output channels.
+        kernel_size (int): Kernel size for the convolutional layer.
+        stride (int): Stride for the convolutional layer.
+        padding (int): Padding for the convolutional layer.
+        model (nn.Sequential): Sequential model comprising convolutional and batch normalization layers.
+
+    Examples:
+        >>> middle_block = MiddleBlock(in_channels=64, out_channels=128)
+        >>> images = torch.randn(1, 64, 64, 64)
+        >>> skip_info = torch.randn(1, 128, 64, 64)
+        >>> output = middle_block(images, skip_info)
+        >>> print(output.size())
+        torch.Size([1, 128, 64, 64])
+    """
     def __init__(self, in_channels=None, out_channels=None):
+        """
+        Initializes the middle block with given input and output channels, setting up the model architecture.
+        
+        Parameters:
+            in_channels (int, optional): The number of channels in the input tensor. Defaults to None.
+            out_channels (int, optional): The number of channels produced by the convolution. Defaults to None.
+        """
         super(MiddleBlock, self).__init__()
 
         self.in_channels = in_channels
@@ -26,6 +57,12 @@ class MiddleBlock(nn.Module):
             print("Middle block not implemented")
 
     def middle_block(self):
+        """
+        Constructs the layers for the middle block, including a convolutional layer and a batch normalization layer.
+        
+        Returns:
+            nn.Sequential: A sequential model containing the defined layers.
+        """
         layers = OrderedDict()
 
         layers["conv"] = nn.Conv2d(
@@ -41,6 +78,19 @@ class MiddleBlock(nn.Module):
         return nn.Sequential(layers)
 
     def forward(self, x=None, skip_info=None):
+        """
+        Forward pass through the middle block with an option for a skip connection.
+        
+        Parameters:
+            x (torch.Tensor, optional): The input tensor to the block. Defaults to None.
+            skip_info (torch.Tensor, optional): An additional tensor for skip connections. Defaults to None.
+        
+        Raises:
+            Exception: If either `x` or `skip_info` is None, indicating incomplete implementation.
+        
+        Returns:
+            torch.Tensor: The output tensor after passing through the block and adding `skip_info`.
+        """
         if (x is not None) and (skip_info is not None):
             return self.model(x) + skip_info
         else:
