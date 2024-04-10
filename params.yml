@@ -12,5 +12,5 @@ netG:
   block:
     kernel_size: 3
     stride: 1
-    padding: 4
+    padding: 1
     residual: 16
