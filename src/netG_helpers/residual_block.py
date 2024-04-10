@@ -10,7 +10,38 @@ from utils import params
 
 
 class ResidualBlock(nn.Module):
+    """
+    Implements a residual block for a neural network, specifically designed for 'netG'. A residual block helps in
+    preventing the vanishing gradient problem in deep networks by allowing an alternate shortcut path for the gradient.
+
+    This block consists of two convolutional layers each followed by batch normalization and a PReLU activation layer,
+    with a skip connection that adds the input directly to the block's output.
+
+    Attributes:
+        in_channels (int): The number of input channels.
+        out_channels (int): The number of output channels.
+        index (int): An identifier for the layers within the block, used for layer naming.
+        kernel_size (int): Kernel size for the convolutional layers.
+        stride (int): Stride for the convolutional layers.
+        padding (int): Padding for the convolutional layers.
+        model (nn.Sequential): The sequential container that comprises the block's layers.
+
+    Examples:
+        >>> residual_block = ResidualBlock(in_channels=64, out_channels=64, index=0)
+        >>> images = torch.randn(1, 64, 64, 64)
+        >>> output = residual_block(images)
+        >>> print(output.size())
+        torch.Size([1, 64, 64, 64])
+    """
     def __init__(self, in_channels=None, out_channels=None, index=None):
+        """
+        Initializes the ResidualBlock with specified configurations.
+        
+        Parameters:
+            in_channels (int, optional): The number of channels in the input tensor. Defaults to None.
+            out_channels (int, optional): The number of channels in the output tensor. Defaults to None.
+            index (int, optional): Index for naming the layers uniquely within the block. Defaults to None.
+        """
         super(ResidualBlock, self).__init__()
 
         self.in_channels = in_channels
@@ -27,6 +58,12 @@ class ResidualBlock(nn.Module):
             print("Residual block not implemented")
 
     def residual_block(self):
+        """
+        Constructs the layers for the residual block, including convolutional, batch normalization, and PReLU layers.
+
+        Returns:
+            nn.Sequential: The sequential model containing the block's layers.
+        """
         layers = OrderedDict()
 
         layers["conv{}".format(self.index)] = nn.Conv2d(
@@ -55,6 +92,18 @@ class ResidualBlock(nn.Module):
         return nn.Sequential(layers)
 
     def forward(self, x=None):
+        """
+        Defines the forward pass of the ResidualBlock with a skip connection that adds the input to the output.
+
+        Parameters:
+            x (torch.Tensor, optional): The input tensor to the block. Defaults to None.
+
+        Raises:
+            Exception: If the input tensor x is None, indicating that the block's implementation is incomplete.
+
+        Returns:
+            torch.Tensor: The output tensor after adding the input to the processed output from the block.
+        """
         if x is not None:
             return x + self.model(x)
         else:
