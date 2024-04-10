@@ -14,6 +14,23 @@ from netG_helpers.out_block import OutputBlock
 
 
 class Generator(nn.Module):
+    """
+    Defines the Generator model for a Super-Resolution GAN (SRGAN). This model aims to upscale low-resolution
+    images into high-resolution counterparts. The generator architecture is composed of an input block, multiple
+    residual blocks, a middle block, upsample blocks, and an output block.
+
+    The network starts with an InputBlock to process the initial features, followed by a series of ResidualBlocks
+    to learn the residual features. A MiddleBlock serves to transition the features before they are upsampled by
+    UpSampleBlocks. Finally, an OutputBlock generates the high-resolution output.
+
+    Attributes:
+        num_repetitive (int): The number of ResidualBlocks used in the generator.
+        input_block (InputBlock): Initial block to process input features.
+        residual_block (nn.Sequential): Sequential container of ResidualBlocks for feature learning.
+        middle_block (MiddleBlock): Block for feature transition before upsampling.
+        up_sample (nn.Sequential): Sequential container of UpSampleBlocks for spatial upsampling of features.
+        out_block (OutputBlock): Final block to produce the high-resolution output.
+    """
     def __init__(self):
         super(Generator, self).__init__()
 
@@ -45,6 +62,18 @@ class Generator(nn.Module):
         self.out_block = OutputBlock(in_channels=64, out_channels=3)
 
     def forward(self, x):
+        """
+        Defines the forward pass of the Generator.
+
+        Parameters:
+            x (torch.Tensor): The input low-resolution image tensor.
+
+        Raises:
+            Exception: If the input tensor x is None, indicating that the implementation of the generator is incomplete.
+
+        Returns:
+            torch.Tensor: The output high-resolution image tensor.
+        """
         if x is not None:
             input = self.input_block(x)
             residual = self.residual_block(input)
