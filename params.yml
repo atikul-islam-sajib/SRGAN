@@ -14,3 +14,4 @@ netG:
     stride: 1
     padding: 1
     residual: 16
+    upscale_factor: 2
