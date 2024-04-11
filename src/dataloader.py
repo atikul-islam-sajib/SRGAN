@@ -3,6 +3,7 @@ import argparse
 import os
 import cv2
 import zipfile
+import pandas as pd
 import matplotlib.pyplot as plt
 from PIL import Image
 from torchvision import transforms
@@ -46,6 +47,11 @@ class Loader(Dataset):
         else:
             raise Exception("Raw data folder not found".capitalize())
 
+    def process_images(self, **kwargs):
+        return self.image_normalized(kwargs["lr_images"])(
+            Image.fromarray(kwargs["images"])
+        )
+
     def extract_images(self):
         if os.path.exists(RAW_DATA_PATH):
             image_path = os.path.join(RAW_DATA_PATH, "images")
@@ -53,7 +59,7 @@ class Loader(Dataset):
             train_images = os.path.join(image_path, os.listdir(image_path)[0])
             test_images = os.path.join(image_path, os.listdir(image_path)[1])
 
-            for idx, path in enumerate([train_images, test_images]):
+            for index, path in enumerate([train_images, test_images]):
                 categories = os.listdir(path)
 
                 for category in categories:
@@ -64,28 +70,28 @@ class Loader(Dataset):
                         self.image = cv2.imread(self.image_path)
 
                         if self.image is not None:
-                            if idx == 0:
+                            if index == 0:
                                 self.train_images.append(
-                                    self.image_normalized(lr_images=True)(
-                                        Image.fromarray(self.image)
+                                    self.process_images(
+                                        lr_images=True, images=self.image
                                     )
                                 )
 
                                 self.train_labels.append(
-                                    self.image_normalized(lr_images=False)(
-                                        Image.fromarray(self.image)
+                                    self.process_images(
+                                        lr_images=False, images=self.image
                                     )
                                 )
                             else:
                                 self.test_images.append(
-                                    self.image_normalized(lr_images=True)(
-                                        Image.fromarray(self.image)
+                                    self.process_images(
+                                        lr_images=True, images=self.image
                                     )
                                 )
 
                                 self.test_labels.append(
-                                    self.image_normalized(lr_images=False)(
-                                        Image.fromarray(self.image)
+                                    self.process_images(
+                                        lr_images=False, images=self.image
                                     )
                                 )
                         else:
@@ -202,29 +208,27 @@ class Loader(Dataset):
             train_lr_images, train_hr_images = next(iter(train_dataloader))
             test_lr_images, test_hr_images = next(iter(test_dataloader))
 
-            print("Train images: {}".format(train))
-            print("Test images: {}".format(test))
+            details = pd.DataFrame(
+                {
+                    "Train Images": [train],
+                    "Test Images": [test],
+                    "Train Images Size(lr)": [train_lr_images.squeeze().size()],
+                    "Test Images Size(lr)": [test_lr_images.squeeze().size()],
+                    "Train Images Size(hr)": [train_hr_images.squeeze().size()],
+                    "Test Images Size(hr)": [test_hr_images.squeeze().size()],
+                },
+                index=["Quantity"],
+            ).T.to_string()
 
-            print(
-                "Train: lower resolution images shape: {}".format(
-                    train_lr_images.squeeze().size()
-                ).capitalize()
-            )
-            print(
-                "Train: higher resolution images shape: {}".format(
-                    train_hr_images.squeeze().size()
-                ).capitalize()
-            )
-            print(
-                "Test: lower resolution images shape: {}".format(
-                    test_lr_images.squeeze().size()
-                ).capitalize()
-            )
-            print(
-                "Test: higher resolution images shape: {}".format(
-                    test_hr_images.squeeze().size()
-                ).capitalize()
-            )
+            try:
+                if os.path.exists("FILES_PATH"):
+                    details.to_csv(
+                        os.path.join("FILES_PATH", "details.csv"), index=False
+                    )
+            except Exception as e:
+                print("Error in dumping train dataloader".capitalize())
+
+            return details
 
         else:
             raise Exception("Processed data folder not found".capitalize())
@@ -256,7 +260,7 @@ if __name__ == "__main__":
             print("Error in creating dataloader".capitalize())
 
         finally:
-            loader.details_dataset()
+            print(loader.details_dataset())
             loader.display_images()
 
     else:
