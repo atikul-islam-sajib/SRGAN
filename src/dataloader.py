@@ -16,7 +16,27 @@ from config import RAW_DATA_PATH, PROCESSED_DATA_PATH, FILES_PATH
 
 
 class Loader(Dataset):
+    """
+    Loader class for processing and creating data loaders for SRGAN training and testing datasets.
+    This class handles image loading, preprocessing, and transformations to create PyTorch DataLoaders.
+
+    Attributes:
+        image_path (str): Path to the zip file containing raw images.
+        in_channels (int): Number of channels in the input images.
+        batch_size (int): Batch size for the DataLoader.
+        image_size (int): Size to which input images are resized.
+    """
+
     def __init__(self, image_path=None, in_channels=3, batch_size=1, image_size=64):
+        """
+        Initializes the Loader with specified configurations for image preprocessing and DataLoader creation.
+
+        Parameters:
+            image_path (str, optional): Path to the zip file containing raw images. Defaults to None.
+            in_channels (int, optional): Number of channels in the input images. Defaults to 3.
+            batch_size (int, optional): Batch size for the DataLoader. Defaults to 1.
+            image_size (int, optional): Size to which input images are resized. Defaults to 64.
+        """
         self.image_path = image_path
         self.batch_size = batch_size
         self.in_channels = in_channels
@@ -30,6 +50,17 @@ class Loader(Dataset):
         self.norm_value = params()["dataloader"]["images"]["normalized"]
 
     def image_transforms(self, lr_images=True):
+        """
+        Constructs a composition of image transformations including resizing, tensor conversion, and normalization.
+
+        Parameters:
+            lr_images (bool): If True, images are considered as low-resolution and resized to `image_size`.
+                              If False, images are considered high-resolution and resized to `image_size * 4`.
+                              Defaults to True.
+
+        Returns:
+            torchvision.transforms.Compose: The composite transformations for image preprocessing.
+        """
         return transforms.Compose(
             [
                 (
@@ -46,6 +77,9 @@ class Loader(Dataset):
         )
 
     def unzip_folder(self):
+        """
+        Unzips the folder containing raw images into the specified directory for raw data.
+        """
         if os.path.exists(RAW_DATA_PATH):
             with zipfile.ZipFile(self.image_path, "r") as zip_file:
                 zip_file.extractall(os.path.join(RAW_DATA_PATH, "images"))
@@ -53,11 +87,27 @@ class Loader(Dataset):
             raise Exception("Raw data folder not found".capitalize())
 
     def process_images(self, **kwargs):
+        """
+        Applies image transformations to a single image.
+
+        Parameters:
+            kwargs (dict): Contains parameters for image processing including 'lr_images' to specify
+                           if the image is low-resolution and 'images' for the image data.
+
+        Returns:
+            torch.Tensor: The transformed image tensor.
+        """
         return self.image_transforms(kwargs["lr_images"])(
             Image.fromarray(kwargs["images"])
         )
 
     def extract_images(self):
+        """
+        Extracts and processes images from the specified directory, splitting them into training and testing datasets.
+
+        Returns:
+            dict: A dictionary containing processed training and testing images and labels.
+        """
         if os.path.exists(RAW_DATA_PATH):
             image_path = os.path.join(RAW_DATA_PATH, "images")
 
@@ -111,6 +161,10 @@ class Loader(Dataset):
             raise Exception("Raw data folder not found".capitalize())
 
     def create_dataloader(self):
+        """
+        Creates and dumps training and testing DataLoaders for the SRGAN project, handling images extraction
+        and processing.
+        """
         try:
             images = self.extract_images()
         except Exception as e:
@@ -123,7 +177,7 @@ class Loader(Dataset):
             )
             test_dataloader = DataLoader(
                 dataset=list(zip(images["test_images"], images["test_labels"])),
-                batch_size=self.batch_size,
+                batch_size=self.batch_size * 64,
                 shuffle=True,
             )
 
@@ -152,6 +206,15 @@ class Loader(Dataset):
 
     @staticmethod
     def image_normalization(**kwargs):
+        """
+        Normalizes an image tensor to the range [0, 1].
+
+        Parameters:
+            kwargs (dict): Contains the 'image' tensor for normalization.
+
+        Returns:
+            np.ndarray: The normalized image array.
+        """
         image = kwargs["image"].squeeze().permute(1, 2, 0)
         image = image.cpu().detach().numpy()
         image = (image - image.min()) / (image.max() - image.min())
@@ -160,25 +223,24 @@ class Loader(Dataset):
 
     @staticmethod
     def display_images():
+        """
+        Displays a batch of low-resolution and corresponding high-resolution images using matplotlib.
+        """
         if os.path.exists(PROCESSED_DATA_PATH):
-            images = list()
-            labels = list()
 
-            train_images = load(
-                filename=os.path.join(PROCESSED_DATA_PATH, "train_dataloader.pkl")
+            lr_images, hr_images = next(
+                iter(
+                    load(
+                        filename=os.path.join(
+                            PROCESSED_DATA_PATH, "test_dataloader.pkl"
+                        )
+                    )
+                )
             )
-
-            for index, (image, label) in enumerate(train_images):
-
-                if index != params()["dataloader"]["images"]["num_images"]:
-                    images.append(image)
-                    labels.append(label)
-                else:
-                    break
 
             plt.figure(figsize=(40, 25))
 
-            for index, (lr_image, hr_image) in enumerate(zip(images, labels)):
+            for index, (lr_image, hr_image) in enumerate(zip(lr_images, hr_images)):
 
                 image = Loader.image_normalization(image=lr_image)
 
@@ -199,6 +261,12 @@ class Loader(Dataset):
 
     @staticmethod
     def details_dataset():
+        """
+        Generates and returns details of the dataset including quantity and size of training/testing images.
+
+        Returns:
+            str: Details of the dataset in string format.
+        """
         if os.path.exists(PROCESSED_DATA_PATH):
             train_dataloader = load(
                 filename=os.path.join(PROCESSED_DATA_PATH, "train_dataloader.pkl")
