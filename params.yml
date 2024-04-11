@@ -15,3 +15,4 @@ netD:
     kernel_size: 3
     stride: 1
     padding: 1
+    num_repetitive: 7
