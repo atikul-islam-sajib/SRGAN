@@ -10,3 +10,8 @@ netG:
     padding: 1
     residual: 16
     upscale_factor: 2
+
+netD:
+    kernel_size: 3
+    stride: 1
+    padding: 1
