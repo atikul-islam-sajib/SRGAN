@@ -92,7 +92,7 @@ class Generator(nn.Module):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generator for SRGAN".title())
     
-    parser.add_argument("--in_channels", type=int, default=1, help="Input channels")
+    parser.add_argument("--in_channels", type=int, default=64, help="Input channels")
     parser.add_argument("--out_channels", type=int, default=64, help="Output channels")
     
     parser.add_argument(
