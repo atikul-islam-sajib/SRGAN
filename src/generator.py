@@ -31,27 +31,29 @@ class Generator(nn.Module):
         up_sample (nn.Sequential): Sequential container of UpSampleBlocks for spatial upsampling of features.
         out_block (OutputBlock): Final block to produce the high-resolution output.
     """
-    def __init__(self):
+    def __init__(self, in_channels = None, out_channels = None):
         super(Generator, self).__init__()
 
+        self.in_channels = in_channels
+        self.out_channels = out_channels
         self.num_repetitive = 16
 
-        self.input_block = InputBlock(in_channels=3, out_channels=64)
+        self.input_block = InputBlock(in_channels=self.in_channels, out_channels=self.out_channels)
 
         self.residual_block = nn.Sequential(
             *[
-                ResidualBlock(in_channels=64, out_channels=64, index=index)
+                ResidualBlock(in_channels=self.out_channels, out_channels=self.out_channels, index=index)
                 for index in range(self.num_repetitive)
             ]
         )
 
-        self.middle_block = MiddleBlock(in_channels=64, out_channels=64)
+        self.middle_block = MiddleBlock(in_channels=self.out_channels, out_channels=self.out_channels)
 
         self.up_sample = nn.Sequential(
             *[
                 UpSampleBlock(
-                    in_channels=64,
-                    out_channels=256,
+                    in_channels=self.out_channels,
+                    out_channels=self.out_channels*4,
                     is_first_block=is_first_block,
                     index=index,
                 )
@@ -59,7 +61,7 @@ class Generator(nn.Module):
             ]
         )
 
-        self.out_block = OutputBlock(in_channels=64, out_channels=3)
+        self.out_block = OutputBlock(in_channels=self.out_channels, out_channels=self.in_channels)
 
     def forward(self, x):
         """
@@ -89,6 +91,10 @@ class Generator(nn.Module):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generator for SRGAN".title())
+    
+    parser.add_argument("--in_channels", type=int, default=1, help="Input channels")
+    parser.add_argument("--out_channels", type=int, default=64, help="Output channels")
+    
     parser.add_argument(
         "--netG", action="store_true", help="Generate a generator".capitalize()
     )
@@ -96,7 +102,10 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.netG:
-        netG = Generator()
+        netG = Generator(
+            in_channels=args.in_channels,
+            out_channels=args.out_channels
+            )
 
         images = torch.randn(64, 3, 64, 64)
 
