@@ -79,7 +79,7 @@ class OutputBlock(nn.Module):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Output block for netD".title())
 
-    parser.add_argument("--in_channels", type=int, default=1, help="Input channels")
+    parser.add_argument("--in_channels", type=int, default=64, help="Input channels")
     parser.add_argument("--out_channels", type=int, default=64, help="Output channels")
 
     args = parser.parse_args()
