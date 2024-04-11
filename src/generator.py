@@ -31,7 +31,7 @@ class Generator(nn.Module):
         up_sample (nn.Sequential): Sequential container of UpSampleBlocks for spatial upsampling of features.
         out_block (OutputBlock): Final block to produce the high-resolution output.
     """
-    def __init__(self, in_channels = None, out_channels = None):
+    def __init__(self, in_channels = 3, out_channels = 64):
         super(Generator, self).__init__()
 
         self.in_channels = in_channels
@@ -107,7 +107,7 @@ if __name__ == "__main__":
             out_channels=args.out_channels
             )
 
-        images = torch.randn(64, 3, 128, 128)
+        images = torch.randn(64, 3, 64, 64)
 
         print(netG(images).shape)
 
