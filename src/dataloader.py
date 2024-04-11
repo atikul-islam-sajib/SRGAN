@@ -11,8 +11,8 @@ from torch.utils.data import DataLoader, Dataset
 
 sys.path.append("src/")
 
-from utils import dump, load
-from config import RAW_DATA_PATH, PROCESSED_DATA_PATH
+from utils import dump, load, params
+from config import RAW_DATA_PATH, PROCESSED_DATA_PATH, FILES_PATH
 
 
 class Loader(Dataset):
@@ -27,7 +27,9 @@ class Loader(Dataset):
         self.test_images = list()
         self.test_labels = list()
 
-    def image_normalized(self, lr_images=True):
+        self.norm_value = params()["dataloader"]["images"]["normalized"]
+
+    def image_transforms(self, lr_images=True):
         return transforms.Compose(
             [
                 (
@@ -36,7 +38,10 @@ class Loader(Dataset):
                     else transforms.Resize((self.image_size * 4, self.image_size * 4))
                 ),
                 transforms.ToTensor(),
-                transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
+                transforms.Normalize(
+                    mean=[self.norm_value, self.norm_value, self.norm_value],
+                    std=[self.norm_value, self.norm_value, self.norm_value],
+                ),
             ]
         )
 
@@ -48,7 +53,7 @@ class Loader(Dataset):
             raise Exception("Raw data folder not found".capitalize())
 
     def process_images(self, **kwargs):
-        return self.image_normalized(kwargs["lr_images"])(
+        return self.image_transforms(kwargs["lr_images"])(
             Image.fromarray(kwargs["images"])
         )
 
@@ -146,6 +151,14 @@ class Loader(Dataset):
                 raise Exception("Processed data folder not found".capitalize())
 
     @staticmethod
+    def image_normalization(**kwargs):
+        image = kwargs["image"].squeeze().permute(1, 2, 0)
+        image = image.cpu().detach().numpy()
+        image = (image - image.min()) / (image.max() - image.min())
+
+        return image
+
+    @staticmethod
     def display_images():
         if os.path.exists(PROCESSED_DATA_PATH):
             images = list()
@@ -157,7 +170,7 @@ class Loader(Dataset):
 
             for index, (image, label) in enumerate(train_images):
 
-                if index != 64:
+                if index != params()["dataloader"]["images"]["num_images"]:
                     images.append(image)
                     labels.append(label)
                 else:
@@ -167,25 +180,17 @@ class Loader(Dataset):
 
             for index, (lr_image, hr_image) in enumerate(zip(images, labels)):
 
-                lr_image = lr_image.squeeze().permute(1, 2, 0)
-                lr_image = lr_image.cpu().detach().numpy()
-                lr_image = (lr_image - lr_image.min()) / (
-                    lr_image.max() - lr_image.min()
-                )
+                image = Loader.image_normalization(image=lr_image)
 
                 plt.subplot(2 * 8, 2 * 8, 2 * index + 1)
-                plt.imshow(lr_image, cmap="gray")
+                plt.imshow(image.squeeze(), cmap="gray")
                 plt.title("lr_image".lower())
                 plt.axis("off")
 
-                hr_image = hr_image.squeeze().permute(1, 2, 0)
-                hr_image = hr_image.cpu().detach().numpy()
-                hr_image = (hr_image - hr_image.min()) / (
-                    hr_image.max() - hr_image.min()
-                )
+                image = Loader.image_normalization(image=hr_image)
 
                 plt.subplot(2 * 8, 2 * 8, 2 * index + 2)
-                plt.imshow(hr_image, cmap="gray")
+                plt.imshow(image.squeeze(), cmap="gray")
                 plt.title("hr_image".lower())
                 plt.axis("off")
 
@@ -221,10 +226,9 @@ class Loader(Dataset):
             ).T.to_string()
 
             try:
-                if os.path.exists("FILES_PATH"):
-                    details.to_csv(
-                        os.path.join("FILES_PATH", "details.csv"), index=False
-                    )
+                if os.path.exists(FILES_PATH):
+                    details.to_csv(os.path.join(FILES_PATH, "details.csv"), index=False)
+
             except Exception as e:
                 print("Error in dumping train dataloader".capitalize())
 
@@ -236,7 +240,9 @@ class Loader(Dataset):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Data Loader for SRGAN".title())
-    parser.add_argument("--image_path", type=str, help="Path to the image".capitalize())
+    parser.add_argument(
+        "--image_path", type=str, help="Path to the image for SRGAN".capitalize()
+    )
     parser.add_argument(
         "--batch_size", type=int, help="Batch size for the dataloader".capitalize()
     )

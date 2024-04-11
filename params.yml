@@ -1,3 +1,8 @@
+dataloader:
+  images:
+    num_images: 64
+    normalized: 0.5
+
 netG:
   input:
     kernel_size: 9
@@ -12,7 +17,7 @@ netG:
     upscale_factor: 2
 
 netD:
-    kernel_size: 3
-    stride: 1
-    padding: 1
-    num_repetitive: 7
+  kernel_size: 3
+  stride: 1
+  padding: 1
+  num_repetitive: 7
