@@ -107,7 +107,7 @@ if __name__ == "__main__":
             out_channels=args.out_channels
             )
 
-        images = torch.randn(64, 3, 64, 64)
+        images = torch.randn(64, 3, 128, 128)
 
         print(netG(images).shape)
 
