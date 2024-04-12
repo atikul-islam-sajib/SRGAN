@@ -59,19 +59,24 @@ def helper(**kwargs):
             )
 
     elif SGD:
-
         try:
             netG = Generator().to(device)
             netD = Discriminator().to(device)
+
         except Exception as e:
             print("The exception caught in the section # {}".format(e).capitalize())
         else:
             optimizerG = optim.SGD(netG.parameters(), lr=lr, momentum=beta1)
-            optimizerG = optim.SGD(netD.parameters(), lr=lr, momentum=beta1)
+            optimizerD = optim.SGD(netD.parameters(), lr=lr, momentum=beta1)
 
     if lr_scheduler:
-        scheduler = StepLR(
+        schedulerG = StepLR(
             optimizerG,
+            step_size=params()["helpers"]["lr_steps"],
+            gamma=params()["helpers"]["lr_gamma"],
+        )
+        schedulerD = StepLR(
+            optimizerD,
             step_size=params()["helpers"]["lr_steps"],
             gamma=params()["helpers"]["lr_gamma"],
         )
@@ -90,7 +95,8 @@ def helper(**kwargs):
         "netD": netD,
         "optimizerG": optimizerG,
         "optimizerD": optimizerD,
-        "lr_scheduler": scheduler,
+        "schedulerG": schedulerG,
+        "schedulerD": schedulerD,
         "adversarial_loss": adversarial_loss,
         "content_loss": content_loss,
     }
