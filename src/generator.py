@@ -31,29 +31,38 @@ class Generator(nn.Module):
         up_sample (nn.Sequential): Sequential container of UpSampleBlocks for spatial upsampling of features.
         out_block (OutputBlock): Final block to produce the high-resolution output.
     """
-    def __init__(self, in_channels = 3, out_channels = 64):
+
+    def __init__(self, in_channels=3, out_channels=64):
         super(Generator, self).__init__()
 
         self.in_channels = in_channels
         self.out_channels = out_channels
         self.num_repetitive = 16
 
-        self.input_block = InputBlock(in_channels=self.in_channels, out_channels=self.out_channels)
+        self.input_block = InputBlock(
+            in_channels=self.in_channels, out_channels=self.out_channels
+        )
 
         self.residual_block = nn.Sequential(
             *[
-                ResidualBlock(in_channels=self.out_channels, out_channels=self.out_channels, index=index)
+                ResidualBlock(
+                    in_channels=self.out_channels,
+                    out_channels=self.out_channels,
+                    index=index,
+                )
                 for index in range(self.num_repetitive)
             ]
         )
 
-        self.middle_block = MiddleBlock(in_channels=self.out_channels, out_channels=self.out_channels)
+        self.middle_block = MiddleBlock(
+            in_channels=self.out_channels, out_channels=self.out_channels
+        )
 
         self.up_sample = nn.Sequential(
             *[
                 UpSampleBlock(
                     in_channels=self.out_channels,
-                    out_channels=self.out_channels*4,
+                    out_channels=self.out_channels * 4,
                     is_first_block=is_first_block,
                     index=index,
                 )
@@ -61,7 +70,9 @@ class Generator(nn.Module):
             ]
         )
 
-        self.out_block = OutputBlock(in_channels=self.out_channels, out_channels=self.in_channels)
+        self.out_block = OutputBlock(
+            in_channels=self.out_channels, out_channels=self.in_channels
+        )
 
     def forward(self, x):
         """
@@ -88,13 +99,32 @@ class Generator(nn.Module):
         else:
             raise Exception("Generator not implemented".capitalize())
 
+    @staticmethod
+    def total_params(model):
+        """
+        Calculates the total number of trainable parameters in the given model.
+
+        Parameters:
+            model (torch.nn.Module): The PyTorch model for which the total parameters need to be calculated.
+
+        Returns:
+            int: Total number of parameters in the model.
+
+        Raises:
+            Exception: If the model is not provided or is None.
+        """
+        if model:
+            return sum(params.numel() for params in model.parameters())
+        else:
+            raise Exception("Model should be provided".capitalize())
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generator for SRGAN".title())
-    
+
     parser.add_argument("--in_channels", type=int, default=64, help="Input channels")
     parser.add_argument("--out_channels", type=int, default=64, help="Output channels")
-    
+
     parser.add_argument(
         "--netG", action="store_true", help="Generate a generator".capitalize()
     )
@@ -102,14 +132,17 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.netG:
-        netG = Generator(
-            in_channels=args.in_channels,
-            out_channels=args.out_channels
-            )
+        netG = Generator(in_channels=args.in_channels, out_channels=args.out_channels)
 
         images = torch.randn(64, 3, 64, 64)
 
         print(netG(images).shape)
+
+        print(
+            "Total params of the Generator model is # {}".format(
+                Generator.total_params(model=netG)
+            )
+        )
 
     else:
         raise Exception("Arguments should be passed".capitalize())
