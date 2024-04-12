@@ -15,6 +15,15 @@ from feature_extractor import VGG16
 
 
 def load_dataloader():
+    """
+    Loads training and testing dataloaders from the processed data path.
+
+    Raises:
+        Exception: If the processed data path does not exist or dataloaders cannot be found.
+
+    Returns:
+        tuple: A tuple containing the train and test dataloaders.
+    """
     if os.path.exists(PROCESSED_DATA_PATH):
         train_dataloader = load(
             filename=os.path.join(PROCESSED_DATA_PATH, "train_dataloader.pkl")
@@ -29,6 +38,15 @@ def load_dataloader():
 
 
 def helper(**kwargs):
+    """
+    Initializes the GAN components including models, optimizers, and loss functions based on the provided configurations.
+
+    Parameters:
+        kwargs (dict): A dictionary containing configuration options such as learning rate, optimizers, and device.
+
+    Returns:
+        dict: A dictionary containing initialized components including models, dataloaders, optimizers, schedulers, and loss functions.
+    """
     lr = kwargs["lr"]
     beta1 = kwargs["beta1"]
     adam = kwargs["adam"]
@@ -100,3 +118,15 @@ def helper(**kwargs):
         "adversarial_loss": adversarial_loss,
         "content_loss": content_loss,
     }
+
+
+if __name__ == "__main__":
+    init = helper(
+        lr=2e-4,
+        beta1=0.5,
+        adam=True,
+        SGD=False,
+        device="mps",
+        is_lr_scheduler=False,
+        display=True,
+    )
