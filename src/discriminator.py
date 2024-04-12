@@ -104,6 +104,25 @@ class Discriminator(nn.Module):
 
         return output.view(-1)
 
+    @staticmethod
+    def total_params(model):
+        """
+        Calculates the total number of trainable parameters in the given model.
+
+        Parameters:
+            model (torch.nn.Module): The PyTorch model for which the total parameters need to be calculated.
+
+        Returns:
+            int: Total number of parameters in the model.
+
+        Raises:
+            Exception: If the model is not provided or is None.
+        """
+        if model:
+            return sum(params.numel() for params in model.parameters())
+        else:
+            raise Exception("Model should be provided".capitalize())
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Discriminator for SRGAN".title())
@@ -121,9 +140,17 @@ if __name__ == "__main__":
             in_channels=args.in_channels, out_channels=args.out_channels
         )
 
+        print(netD)
+
         images = torch.randn(1, 3, 256, 256)
 
         print(netD(images).shape)
+
+        print(
+            "Total params of the Discriminator model is # {}".format(
+                Discriminator.total_params(model=netD)
+            )
+        )
 
     else:
         raise Exception("Arguments should be passed".capitalize())
