@@ -11,6 +11,7 @@ from netD_helpers.input_block import InputBlock
 from netD_helpers.features_block import FeatureBlock
 from netD_helpers.output_block import OutputBlock
 
+
 class Discriminator(nn.Module):
     """
     Defines the Discriminator model for a GAN architecture, specifically designed for tasks like super-resolution
@@ -31,7 +32,8 @@ class Discriminator(nn.Module):
         avg_pool (nn.AdaptiveMaxPool2d): Adaptive max pooling layer to reduce spatial dimensions.
         output (OutputBlock): Final block to output the discriminator's classification.
     """
-    def __init__(self, in_channels = 3, out_channels = 64):
+
+    def __init__(self, in_channels=3, out_channels=64):
         """
         Initializes the Discriminator model with specified configurations for its input and feature extraction layers.
 
@@ -43,38 +45,49 @@ class Discriminator(nn.Module):
         self.in_channels = in_channels
         self.out_channels = out_channels
         self.filters = out_channels
-        
+
         try:
             self.kernel_size = params()["netD"]["kernel_size"]
             self.stride = params()["netD"]["stride"]
             self.padding = params()["netD"]["padding"]
             self.num_repetitive = params()["netD"]["num_repetitive"]
-            
+
         except Exception as e:
             print("The exception caught in the section # {}".format(e).capitalize())
-            
+
         else:
             self.layers = []
-        
-        self.input = InputBlock(in_channels=self.in_channels, out_channels=self.out_channels)
-        
+
+        self.input = InputBlock(
+            in_channels=self.in_channels, out_channels=self.out_channels
+        )
+
         for index in range(self.num_repetitive):
-            if index%2:
-                self.layers.append(FeatureBlock(in_channels = self.out_channels, out_channels=self.out_channels*2))
-                
-                self.out_channels = self.out_channels*2
-            
+            if index % 2:
+                self.layers.append(
+                    FeatureBlock(
+                        in_channels=self.out_channels,
+                        out_channels=self.out_channels * 2,
+                    )
+                )
+
+                self.out_channels = self.out_channels * 2
+
             else:
-                self.layers.append(FeatureBlock(in_channels = self.out_channels, out_channels=self.out_channels))
-                
+                self.layers.append(
+                    FeatureBlock(
+                        in_channels=self.out_channels, out_channels=self.out_channels
+                    )
+                )
+
                 self.out_channels = self.out_channels
-                
+
         self.features = nn.Sequential(*self.layers)
-        
+
         self.avg_pool = nn.AdaptiveMaxPool2d(output_size=1)
-        
+
         self.output = OutputBlock(in_channels=self.filters, out_channels=1)
-        
+
     def forward(self, x):
         """
         Defines the forward pass through the Discriminator model.
@@ -88,14 +101,15 @@ class Discriminator(nn.Module):
         input = self.input(x)
         features = self.features(input)
         output = self.output(self.avg_pool(features))
-        
+
         return output.view(-1)
-    
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Discriminator for SRGAN".title())
     parser.add_argument("--in_channels", type=int, default=1, help="Input channels")
     parser.add_argument("--out_channels", type=int, default=64, help="Output channels")
-    
+
     parser.add_argument(
         "--netD", action="store_true", help="Generate a generator".capitalize()
     )
@@ -104,9 +118,8 @@ if __name__ == "__main__":
 
     if args.netD:
         netD = Discriminator(
-            in_channels=args.in_channels,
-            out_channels=args.out_channels
-            )
+            in_channels=args.in_channels, out_channels=args.out_channels
+        )
 
         images = torch.randn(1, 3, 256, 256)
 
