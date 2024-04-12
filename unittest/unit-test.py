@@ -6,6 +6,7 @@ sys.path.append("src/")
 
 from generator import Generator
 from discriminator import Discriminator
+from feature_extractor import VGG16
 
 
 class UnitTest(unittest.TestCase):
@@ -25,6 +26,7 @@ class UnitTest(unittest.TestCase):
         self.images = torch.randn(1, 3, 64, 64)
         self.netG = Generator(in_channels=3, out_channels=64)
         self.netD = Discriminator(in_channels=3, out_channels=64)
+        self.vgg = VGG16(pretrained=True)
 
     def tearDown(self) -> None:
         """
@@ -64,6 +66,9 @@ class UnitTest(unittest.TestCase):
         """
         total_params = sum(params.numel() for params in self.netD.parameters())
         self.assertEqual(total_params, 5252481)  # Pre-calculated expected value
+
+    def test_VGG16_shape(self):
+        self.assertEquals(self.vgg(self.images).size(), torch.Size([1, 256, 16, 16]))
 
 
 if __name__ == "__main__":
