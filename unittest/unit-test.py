@@ -26,6 +26,11 @@ class UnitTest(unittest.TestCase):
         self.images = torch.randn(1, 3, 64 * 4, 64 * 4)
         self.assertEquals(self.netD(self.images).size(), torch.Size([1]))
 
+    def test_netG_total_params(self):
+        self.assertEqual(
+            sum(params.numel() for params in self.netG.parameters()), 1549461
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
