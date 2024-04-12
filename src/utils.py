@@ -42,7 +42,7 @@ def weight_int(m, he_normal=False):
             nn.init.constant_(m.bias.data, 0)
 
 
-def device_init(device):
+def device_init(device="mps"):
     if device == "mps":
         return torch.device("mps" if torch.backends.mps.is_available() else "cpu")
 
