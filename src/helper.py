@@ -121,6 +121,7 @@ def helper(**kwargs):
 
 
 if __name__ == "__main__":
+
     init = helper(
         lr=2e-4,
         beta1=0.5,
