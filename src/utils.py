@@ -51,3 +51,7 @@ def device_init(device):
 
     else:
         return torch.device("cpu")
+
+
+def clean():
+    pass
