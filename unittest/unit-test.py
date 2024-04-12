@@ -68,6 +68,9 @@ class UnitTest(unittest.TestCase):
         self.assertEqual(total_params, 5252481)  # Pre-calculated expected value
 
     def test_VGG16_shape(self):
+        """
+        Test to verify that the total number of trainable parameters in the discriminator is as expected.
+        """
         self.assertEquals(self.vgg(self.images).size(), torch.Size([1, 256, 16, 16]))
 
 
