@@ -21,3 +21,8 @@ netD:
   stride: 1
   padding: 1
   num_repetitive: 7
+
+helpers:
+  beta2: 0.999
+  lr_steps: 10
+  lr_gamma: 0.1
