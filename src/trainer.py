@@ -30,6 +30,18 @@ class Trainer(nn.Module):
         self.display = display
 
     def l1(self, model):
+        """
+        Calculates the L1 norm (sum of absolute values) of all the parameters in the given model.
+
+        Parameters:
+            model (torch.nn.Module): The model whose parameters' L1 norm is to be calculated.
+
+        Returns:
+            float: The L1 norm of the model's parameters.
+
+        Raises:
+            Exception: If no model is provided.
+        """
         if model is not None:
             return (
                 torch.norm(input=params, p=1) for params in model.parameters()
@@ -38,6 +50,18 @@ class Trainer(nn.Module):
             raise Exception("Model should be provided".capitalize())
 
     def l2(self, model):
+        """
+        Calculates the L2 norm (square root of the sum of squares) of all the parameters in the given model.
+
+        Parameters:
+            model (torch.nn.Module): The model whose parameters' L2 norm is to be calculated.
+
+        Returns:
+            float: The L2 norm of the model's parameters.
+
+        Raises:
+            Exception: If no model is provided.
+        """
         if model is not None:
             return (
                 torch.norm(input=params, p=2) for params in model.parameters()
@@ -46,6 +70,19 @@ class Trainer(nn.Module):
             raise Exception("Model should be provided".capitalize())
 
     def elastic_net(self, model):
+        """
+        Calculates the Elastic Net regularization, which is the sum of L1 and L2 norms, for all the parameters
+        in the given model.
+
+        Parameters:
+            model (torch.nn.Module): The model whose parameters' Elastic Net regularization is to be calculated.
+
+        Returns:
+            float: The sum of L1 and L2 norms of the model's parameters.
+
+        Raises:
+            Exception: If no model is provided.
+        """
         if model is not None:
             l1 = self.l1(model=model)
             l2 = self.l2(model=model)
