@@ -7,11 +7,17 @@ import torch
 import torch.nn as nn
 from tqdm import tqdm
 
+import warnings
+
 sys.path.append("src/")
 
 from config import TRAIN_MODELS, BEST_MODELS, BEST_MODEL
 from helpers import helper
-from utils import weight_int
+from utils import weight_init
+
+import warnings
+
+warnings.filterwarnings("ignore")
 
 
 class Trainer:
@@ -102,8 +108,8 @@ class Trainer:
 
             finally:
 
-                self.netG = self.netG.apply(weight_int)
-                self.netD = self.netD.apply(weight_int)
+                self.netG = self.netG.apply(weight_init)
+                self.netD = self.netD.apply(weight_init)
 
             self.optimizerG = init["optimizerG"]
             self.optimizerD = init["optimizerD"]
@@ -204,7 +210,6 @@ class Trainer:
                         "netG_loss": kwargs["netG_loss"],
                     },
                     os.path.join(BEST_MODELS, "netG{}.pth".format(kwargs["epoch"])),
-                    os.path.join(BEST_MODEL, "best_model.pth"),
                 )
 
         else:
@@ -268,7 +273,7 @@ class Trainer:
         try:
             generated_hr = self.netG(kwargs["lr_images"])
 
-            loss = 0.5 * self.adversarial_loss(generated_hr, kwargs["hr_labels"])
+            loss = 0.5 * self.adversarial_loss(generated_hr, kwargs["hr_images"])
 
         except KeyError as e:
             print("The exception caught in # {}".format(e).capitalize())
@@ -286,6 +291,8 @@ class Trainer:
         pass
 
     def train(self):
+        warnings.filterwarnings("ignore")
+
         for epoch in tqdm(range(self.epochs)):
             self.netG_loss = list()
             self.netD_loss = list()
@@ -317,7 +324,7 @@ class Trainer:
                 hr_images = hr_images.to(self.device)
 
                 loss = self.validate_model_on_test_data(
-                    lr_images=lr_images, hr_images=hr_images, real_labels=real_labels
+                    lr_images=lr_images, hr_images=hr_images
                 )
 
                 self.test_loss.append(loss)
@@ -341,11 +348,11 @@ class Trainer:
                 )
             )
 
-        try:
-            print(pd.DataFrame(self.loss_track))
+        # try:
+        #     print(pd.DataFrame(self.loss_track))
 
-        except Exception as e:
-            print("The exception caught in # {}".format(e).capitalize())
+        # except Exception as e:
+        #     print("The exception caught in # {}".format(e).capitalize())
 
     @staticmethod
     def plot_history():
@@ -354,7 +361,7 @@ class Trainer:
 
 if __name__ == "__main__":
     trainer = Trainer(
-        epochs=5,
+        epochs=1,
         lr=0.0002,
         device="mps",
         adam=True,

@@ -191,15 +191,23 @@ class Loader(Dataset):
                         else:
                             continue
 
-            if self.is_sub_samples:
+            if self.is_sub_samples == True:
                 self.images = self.get_subsample_of_dataloader()
 
-            return {
-                "train_images": self.images["train_images"],
-                "train_labels": self.images["train_labels"],
-                "test_images": self.images["test_images"],
-                "test_labels": self.images["test_labels"],
-            }
+                return {
+                    "train_images": self.images["train_images"],
+                    "train_labels": self.images["train_labels"],
+                    "test_images": self.images["test_images"],
+                    "test_labels": self.images["test_labels"],
+                }
+
+            else:
+                return {
+                    "train_images": self.train_images,
+                    "train_labels": self.train_labels,
+                    "test_images": self.test_images,
+                    "test_labels": self.test_labels,
+                }
         else:
             raise Exception("Raw data folder not found".capitalize())
 
