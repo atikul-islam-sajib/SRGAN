@@ -1,10 +1,15 @@
 import sys
+import os
 import argparse
+import numpy as np
+import pandas as pd
 import torch
 import torch.nn as nn
+from tqdm import tqdm
 
 sys.path.append("src/")
 
+from config import TRAIN_MODELS, BEST_MODELS, BEST_MODEL
 from helpers import helper
 from utils import weight_int
 
@@ -107,6 +112,9 @@ class Trainer:
             self.adversarial_loss = init["adversarial_loss"]
             self.content_loss = init["content_loss"]
 
+            self.infinity = float("inf")
+            self.loss_track = {"netG": [], "netD": []}
+
     def l1(self, model):
         """
         Calculates the L1 norm (sum of absolute values) of all the parameters in the given model.
@@ -169,23 +177,175 @@ class Trainer:
         else:
             raise Exception("Model should be provided".capitalize())
 
-    def save_checkpoints(self):
-        pass
+    def save_checkpoints(self, **kwargs):
+        if (
+            (os.path.exists(TRAIN_MODELS))
+            and (os.path.exists(BEST_MODELS))
+            and os.path.exists(BEST_MODEL)
+        ):
+            torch.save(
+                {
+                    "netG": self.netG.state_dict(),
+                    "netG_loss": kwargs["netG_loss"],
+                },
+                os.path.join(TRAIN_MODELS, "netG{}.pth".format(kwargs["epoch"])),
+            )
 
-    def update_discriminator_training(self):
-        pass
+            self.loss_track["netG"].append(kwargs["netG_loss"])
+            self.loss_track["netD"].append(kwargs["netD_loss"])
 
-    def update_generator_training(self):
-        pass
+            if self.infinity > kwargs["netG_loss"]:
+
+                self.infinity = kwargs["netG_loss"]
+
+                torch.save(
+                    {
+                        "netG": self.netG.state_dict(),
+                        "netG_loss": kwargs["netG_loss"],
+                    },
+                    os.path.join(BEST_MODELS, "netG{}.pth".format(kwargs["epoch"])),
+                    os.path.join(BEST_MODEL, "best_model.pth"),
+                )
+
+        else:
+            raise FileExistsError("The directory should be created".capitalize())
+
+    def update_discriminator_training(self, **kwargs):
+        try:
+            self.optimizerD.zero_grad()
+
+            hr_loss = self.adversarial_loss(
+                self.netD(kwargs["hr_images"]), kwargs["real_labels"]
+            )
+            fake_loss = self.adversarial_loss(
+                self.netD(self.netG(kwargs["lr_images"])), kwargs["fake_labels"]
+            )
+
+            total_loss = 0.5 * (hr_loss + fake_loss)
+
+            total_loss.backward()
+            self.optimizerD.step()
+
+        except KeyError as e:
+            print("The exception caught in (Discriminator) # {}".format(e).capitalize())
+
+        except Exception as e:
+            print("The exception caught in (Discriminator)# {}".format(e).capitalize())
+
+        else:
+            return total_loss.item()
+
+    def update_generator_training(self, **kwargs):
+        try:
+            self.optimizerD.zero_grad()
+
+            generated_hr = self.netG(kwargs["lr_images"])
+
+            adversarial_loss = self.adversarial_loss(
+                generated_hr, kwargs["real_labels"]
+            )
+
+            real_features = self.content_loss(kwargs["hr_images"])
+            fake_features = self.content_loss(generated_hr)
+
+            content_loss = 1e-3 * torch.abs(real_features - fake_features).mean()
+
+            total_loss = adversarial_loss + content_loss
+
+            total_loss.backward()
+            self.optimizerG.step()
+
+        except KeyError as e:
+            print("The exception caught in (Generator) # {}".format(e).capitalize())
+
+        except Exception as e:
+            print("The exception caught in (Generator)# {}".format(e).capitalize())
+
+        else:
+            return total_loss.item()
+
+    def validate_model_on_test_data(self, **kwargs):
+        try:
+            generated_hr = self.netG(kwargs["lr_images"])
+
+            loss = 0.5 * self.adversarial_loss(generated_hr, kwargs["hr_labels"])
+
+        except KeyError as e:
+            print("The exception caught in # {}".format(e).capitalize())
+
+        except Exception as e:
+            print("The exception caught in # {}".format(e).capitalize())
+
+        else:
+            return loss.item()
 
     def save_training_images(self):
         pass
 
-    def show_progress(self):
+    def show_progress(self, **kwargs):
         pass
 
     def train(self):
-        pass
+        for epoch in tqdm(range(self.epochs)):
+            self.netG_loss = list()
+            self.netD_loss = list()
+            self.test_loss = list()
+
+            for _, (lr_images, hr_images) in enumerate(self.train_dataloader):
+                lr_images = lr_images.to(self.device)
+                hr_images = hr_images.to(self.device)
+                batch_size = hr_images.size(0)
+
+                real_labels = torch.ones((batch_size,)).to(self.device)
+                fake_labels = torch.zeros((batch_size,)).to(self.device)
+
+                D_loss = self.update_discriminator_training(
+                    lr_images=lr_images,
+                    hr_images=hr_images,
+                    real_labels=real_labels,
+                    fake_labels=fake_labels,
+                )
+                G_loss = self.update_generator_training(
+                    lr_images=lr_images, hr_images=hr_images, real_labels=real_labels
+                )
+
+                self.netG_loss.append(G_loss)
+                self.netD_loss.append(D_loss)
+
+            for _, (lr_images, hr_images) in enumerate(self.test_dataloader):
+                lr_images = lr_images.to(self.device)
+                hr_images = hr_images.to(self.device)
+
+                loss = self.validate_model_on_test_data(
+                    lr_images=lr_images, hr_images=hr_images, real_labels=real_labels
+                )
+
+                self.test_loss.append(loss)
+
+            try:
+                self.save_checkpoints(
+                    epoch=epoch + 1,
+                    netG_loss=np.array(self.netG_loss).mean(),
+                    netD_loss=np.array(self.netD_loss).mean(),
+                )
+            except Exception as e:
+                print("The exception caught in # {}".format(e).capitalize())
+
+            print(
+                "Epochs - [{}/{}] - train_netG_loss: {:.5f} - train_netD_loss: {:.5f} - test_loss: {:.5f}".format(
+                    epoch + 1,
+                    self.epochs,
+                    np.mean(self.netG_loss),
+                    np.mean(self.netD_loss),
+                    np.mean(self.test_loss),
+                )
+            )
+
+        try:
+            print(pd.DataFrame(self.loss_track))
+
+        except Exception as e:
+            print("The exception caught in # {}".format(e).capitalize())
 
     @staticmethod
     def plot_history():
