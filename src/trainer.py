@@ -30,10 +30,20 @@ class Trainer(nn.Module):
         self.display = display
 
     def l1(self, model):
-        pass
+        if model is not None:
+            return (
+                torch.norm(input=params, p=1) for params in model.parameters()
+            ).sum()
+        else:
+            raise Exception("Model should be provided".capitalize())
 
     def l2(self, model):
-        pass
+        if model is not None:
+            return (
+                torch.norm(input=params, p=2) for params in model.parameters()
+            ).sum()
+        else:
+            raise Exception("Model should be provided".capitalize())
 
     def elastic_net(self, model):
         pass
