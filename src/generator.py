@@ -32,7 +32,7 @@ class Generator(nn.Module):
         out_block (OutputBlock): Final block to produce the high-resolution output.
     """
 
-    def __init__(self, in_channels=3, out_channels=64):
+    def __init__(self, in_channels=3, out_channels=32):
         super(Generator, self).__init__()
 
         self.in_channels = in_channels

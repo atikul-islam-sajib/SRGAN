@@ -118,7 +118,7 @@ def helper(**kwargs):
         "schedulerG": schedulerG,
         "schedulerD": schedulerD,
         "adversarial_loss": adversarial_loss,
-        "content_loss": content_loss,
+        "criterion_loss": content_loss,
     }
 
 

@@ -124,8 +124,8 @@ class Loader(Dataset):
                   - 'test_labels': Subsampled testing labels.
         """
 
-        train_samples = len(self.train_images) // 5
-        test_samples = len(self.test_images) // 2
+        train_samples = len(self.train_images) // 50
+        test_samples = len(self.test_images) // 50
 
         self.train_images = self.train_images[:train_samples]
         self.train_labels = self.train_labels[:train_samples]

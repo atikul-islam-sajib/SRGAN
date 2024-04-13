@@ -36,23 +36,15 @@ class VGG16(nn.Module):
         self.name = "Feature Extractor"
 
         self.pretrained = pretrained
-        self.freeze_weights = freeze_weights
         self.is_vgg16 = is_vgg16
         self.num_layers = 18
 
         if self.is_vgg16:
             self.model = models.vgg16(pretrained=True)
-
-            for params in self.model.parameters():
-                params.requires_grad = False
-
             self.num_layers = 14
 
         else:
             self.model = models.vgg19(pretrained=True)
-
-            for params in self.model.parameters():
-                params.requires_grad = False
 
         self.model = nn.Sequential(
             *list(self.model.features.children())[: self.num_layers]
@@ -89,12 +81,6 @@ if __name__ == "__main__":
         help="Use pretrained weights".capitalize(),
     )
     parser.add_argument(
-        "--freeze_weights",
-        type=bool,
-        default=False,
-        help="Freeze the weights".capitalize(),
-    )
-    parser.add_argument(
         "--is_vgg16",
         type=bool,
         default=False,
@@ -103,10 +89,9 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    if args.pretrained and args.freeze_weights and args.is_vgg16:
+    if args.pretrained and args.is_vgg16:
         net = VGG16(
             pretrained=args.pretrained,
-            freeze_weights=args.freeze_weights,
             is_vgg16=args.is_vgg16,
         )
 

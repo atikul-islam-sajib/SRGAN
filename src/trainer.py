@@ -104,15 +104,18 @@ class Trainer:
             self.train_dataloader = init["train_dataloader"]
             self.test_dataloader = init["test_dataloader"]
 
-            self.netG = init["netG"].apply(weight_init)
-            self.netD = init["netD"].apply(weight_init)
+            # self.netG = init["netG"].apply(weight_init)
+            # self.netD = init["netD"].apply(weight_init)
+
+            self.netG = init["netG"]
+            self.netD = init["netD"]
 
             self.optimizerG = init["optimizerG"]
             self.optimizerD = init["optimizerD"]
             self.schedulerG = init["schedulerG"]
             self.schedulerD = init["schedulerD"]
             self.adversarial_loss = init["adversarial_loss"]
-            self.criterion_content = init["content_loss"]
+            self.criterion_content = init["criterion_loss"]
 
             self.infinity = float("inf")
             self.loss_track = {"netG": [], "netD": []}
@@ -238,29 +241,28 @@ class Trainer:
 
     def update_generator_training(self, **kwargs):
         try:
-            self.optimizerD.zero_grad()
+            self.optimizerG.zero_grad()
 
             generated_hr = self.netG(kwargs["lr_images"])
 
             adversarial_loss = self.adversarial_loss(
-                generated_hr, kwargs["real_labels"]
+                self.netD(generated_hr), kwargs["real_labels"]
             )
 
             real_features = self.criterion_content(kwargs["hr_images"])
             fake_features = self.criterion_content(generated_hr)
 
-            content_loss = torch.abs(real_features - fake_features).mean()
-
-            total_loss = self.content_loss * adversarial_loss + content_loss
+            content_loss_vgg = torch.abs(real_features - fake_features).mean()
+            total_loss = self.content_loss * adversarial_loss + content_loss_vgg
 
             total_loss.backward()
             self.optimizerG.step()
 
         except KeyError as e:
-            print("The exception caught in (Generator) # {}".format(e).capitalize())
+            print("The Exception caught in (Generator) # {}".format(e).capitalize())
 
         except Exception as e:
-            print("The exception caught in (Generator)# {}".format(e).capitalize())
+            print("The Exception caught in (Generator) # {}".format(e).capitalize())
 
         else:
             return total_loss.item()
@@ -269,7 +271,7 @@ class Trainer:
         try:
             generated_hr = self.netG(kwargs["lr_images"])
 
-            loss = 0.5 * self.adversarial_loss(generated_hr, kwargs["hr_images"])
+            loss = self.adversarial_loss(generated_hr, kwargs["hr_images"])
 
         except KeyError as e:
             print("The exception caught in # {}".format(e).capitalize())
@@ -336,14 +338,16 @@ class Trainer:
 
             else:
                 lr_images, hr_images = next(iter(self.test_dataloader))
+                lr_images = lr_images.to(self.device)
+                hr_images = hr_images.to(self.device)
 
-                generated_hr_images = self.netG(lr_images)
+                generated_hr_images = self.netG(lr_images[0:8])
 
                 if os.path.exists(TRAIN_IMAGES):
                     save_image(
                         generated_hr_images,
                         os.path.join(TRAIN_IMAGES, "train_{}.png".format(epoch + 1)),
-                        nrow=8,
+                        nrow=4,
                     )
                 else:
                     raise FileExistsError(
@@ -373,9 +377,9 @@ class Trainer:
 
 if __name__ == "__main__":
     trainer = Trainer(
-        epochs=5,
-        lr=0.0001,
-        content_loss=0.01,
+        epochs=100,
+        lr=0.0002,
+        content_loss=0.001,
         device="mps",
         adam=True,
         SGD=False,

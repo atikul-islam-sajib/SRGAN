@@ -142,7 +142,7 @@ if __name__ == "__main__":
 
         print(netD)
 
-        images = torch.randn(1, 3, 256, 256)
+        images = torch.randn(4, 3, 64, 64)
 
         print(netD(images).shape)
 

@@ -5,6 +5,7 @@ import torch.nn as nn
 
 sys.path.append("src/")
 
+
 class OutputBlock(nn.Module):
     """
     Represents the final output block of the discriminator network (netD), designed to consolidate features extracted
@@ -27,7 +28,8 @@ class OutputBlock(nn.Module):
         >>> print(output.size())
         torch.Size([1, 1, 1, 1])
     """
-    def __init__(self, in_channels = None, out_channels=None):
+
+    def __init__(self, in_channels=None, out_channels=None):
         """
         Initializes the OutputBlock with the specified number of input and output channels. The `kernel_size` is
         set to match the `out_channels`, which may need adjustment based on the network design and input dimensions.
@@ -37,13 +39,13 @@ class OutputBlock(nn.Module):
             out_channels (int, optional): The base number of output channels for scaling purposes. Defaults to None.
         """
         super(OutputBlock, self).__init__()
-        
+
         self.in_channels = in_channels
         self.out_channels = out_channels
         self.kernel_size = out_channels
-        
+
         self.model = self.output_block()
-        
+
     def output_block(self):
         """
         Constructs the output block's layers, including two convolutional layers with LeakyReLU activation,
@@ -53,12 +55,11 @@ class OutputBlock(nn.Module):
             nn.Sequential: The sequential model containing the defined layers.
         """
         return nn.Sequential(
-            nn.Conv2d(self.in_channels*8, self.in_channels*16, self.kernel_size),
+            nn.Conv2d(self.in_channels * 8, self.in_channels * 16, self.kernel_size),
             nn.LeakyReLU(negative_slope=0.2, inplace=True),
-            nn.Conv2d(self.in_channels*16, 1, self.kernel_size),
-            nn.Tanh() 
+            nn.Conv2d(self.in_channels * 16, 1, self.kernel_size),
         )
-        
+
     def forward(self, x):
         """
         Defines the forward pass of the OutputBlock.
@@ -74,8 +75,8 @@ class OutputBlock(nn.Module):
         """
         if x is not None:
             return self.model(x)
-        
-        
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Output block for netD".title())
 
@@ -94,4 +95,6 @@ if __name__ == "__main__":
         print(out_block(images).size())
 
     else:
-        raise Exception("Output Block channels and output channels are required".capitalize())
+        raise Exception(
+            "Output Block channels and output channels are required".capitalize()
+        )
