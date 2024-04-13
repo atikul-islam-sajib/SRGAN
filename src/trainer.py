@@ -10,6 +10,25 @@ from utils import weight_int
 
 
 class Trainer:
+    """
+    A class responsible for setting up and running training sessions for a GAN architecture,
+    specifically for models dealing with image data. The trainer initializes models, dataloaders,
+    optimizers, and loss functions, and handles training epochs.
+
+    Attributes:
+        epochs (int): Number of epochs to train the model.
+        lr (float): Learning rate for the optimizer.
+        device (str): Device to run the model on ('cuda', 'mps', or 'cpu').
+        adam (bool): Flag to use Adam optimizer; mutually exclusive with SGD.
+        SGD (bool): Flag to use SGD optimizer; mutually exclusive with Adam.
+        beta1 (float): Beta1 hyperparameter for the Adam optimizer.
+        is_l1 (bool): If True, includes L1 regularization in the loss calculation.
+        is_l2 (bool): If True, includes L2 regularization in the loss calculation.
+        is_elastic_net (bool): If True, includes both L1 and L2 regularizations as Elastic Net in the loss calculation.
+        is_lr_scheduler (bool): If True, includes a learning rate scheduler.
+        display (bool): If True, training progress and statistics will be displayed.
+    """
+
     def __init__(
         self,
         epochs=100,
@@ -24,6 +43,23 @@ class Trainer:
         is_lr_scheduler=False,
         display=True,
     ):
+        """
+        Initializes the Trainer object with the necessary configuration and parameters for training.
+        Loads the data, models, optimizers, and loss functions.
+
+        Parameters:
+            epochs (int): Number of training epochs.
+            lr (float): Learning rate for the optimizers.
+            device (str): Device type for training ('cuda', 'mps', 'cpu').
+            adam (bool): Whether to use Adam optimizer.
+            SGD (bool): Whether to use SGD optimizer.
+            beta1 (float): Beta1 parameter for the Adam optimizer.
+            is_l1 (bool): Enables L1 regularization if True.
+            is_l2 (bool): Enables L2 regularization if True.
+            is_elastic_net (bool): Enables Elastic Net regularization (L1 + L2) if True.
+            is_lr_scheduler (bool): If True, applies a learning rate scheduler.
+            display (bool): If set to True, displays training progress.
+        """
         self.epochs = epochs
         self.lr = lr
         self.device = device
