@@ -6,12 +6,15 @@ import pandas as pd
 import torch
 import torch.nn as nn
 from tqdm import tqdm
+from torchvision.utils import save_image
 
 import warnings
 
+warnings.filterwarnings("ignore")
+
 sys.path.append("src/")
 
-from config import TRAIN_MODELS, BEST_MODELS, BEST_MODEL
+from config import TRAIN_MODELS, BEST_MODELS, BEST_MODEL, TRAIN_IMAGES
 from helpers import helper
 from utils import weight_init
 
@@ -101,17 +104,8 @@ class Trainer:
             self.train_dataloader = init["train_dataloader"]
             self.test_dataloader = init["test_dataloader"]
 
-            try:
-                self.netG = init["netG"]
-                self.netD = init["netD"]
-
-            except Exception as e:
-                print("The exception caught in the section # {}".format(e).capitalize())
-
-            finally:
-
-                self.netG = self.netG.apply(weight_init)
-                self.netD = self.netD.apply(weight_init)
+            self.netG = init["netG"].apply(weight_init)
+            self.netD = init["netD"].apply(weight_init)
 
             self.optimizerG = init["optimizerG"]
             self.optimizerD = init["optimizerD"]
@@ -255,11 +249,9 @@ class Trainer:
             real_features = self.criterion_content(kwargs["hr_images"])
             fake_features = self.criterion_content(generated_hr)
 
-            content_loss = (
-                self.content_loss * torch.abs(real_features - fake_features).mean()
-            )
+            content_loss = torch.abs(real_features - fake_features).mean()
 
-            total_loss = adversarial_loss + content_loss
+            total_loss = self.content_loss * adversarial_loss + content_loss
 
             total_loss.backward()
             self.optimizerG.step()
@@ -342,6 +334,22 @@ class Trainer:
             except Exception as e:
                 print("The exception caught in # {}".format(e).capitalize())
 
+            else:
+                lr_images, hr_images = next(iter(self.test_dataloader))
+
+                generated_hr_images = self.netG(lr_images)
+
+                if os.path.exists(TRAIN_IMAGES):
+                    save_image(
+                        generated_hr_images,
+                        os.path.join(TRAIN_IMAGES, "train_{}.png".format(epoch + 1)),
+                        nrow=8,
+                    )
+                else:
+                    raise FileExistsError(
+                        "The directory should be created".capitalize()
+                    )
+
             print(
                 "Epochs - [{}/{}] - train_netG_loss: {:.5f} - train_netD_loss: {:.5f} - test_loss: {:.5f}".format(
                     epoch + 1,
@@ -365,8 +373,9 @@ class Trainer:
 
 if __name__ == "__main__":
     trainer = Trainer(
-        epochs=1,
-        lr=0.0002,
+        epochs=5,
+        lr=0.0001,
+        content_loss=0.01,
         device="mps",
         adam=True,
         SGD=False,
