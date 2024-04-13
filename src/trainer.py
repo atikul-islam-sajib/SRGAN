@@ -46,7 +46,13 @@ class Trainer(nn.Module):
             raise Exception("Model should be provided".capitalize())
 
     def elastic_net(self, model):
-        pass
+        if model is not None:
+            l1 = self.l1(model=model)
+            l2 = self.l2(model=model)
+
+            return l1 + l2
+        else:
+            raise Exception("Model should be provided".capitalize())
 
     def save_checkpoints(self):
         pass
