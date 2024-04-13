@@ -44,6 +44,7 @@ class Trainer:
         self,
         epochs=100,
         lr=0.0002,
+        content_loss=1e-2,
         device="mps",
         adam=True,
         SGD=False,
@@ -73,6 +74,7 @@ class Trainer:
         """
         self.epochs = epochs
         self.lr = lr
+        self.content_loss = content_loss
         self.device = device
         self.adam = adam
         self.SGD = SGD
@@ -116,7 +118,7 @@ class Trainer:
             self.schedulerG = init["schedulerG"]
             self.schedulerD = init["schedulerD"]
             self.adversarial_loss = init["adversarial_loss"]
-            self.content_loss = init["content_loss"]
+            self.criterion_content = init["content_loss"]
 
             self.infinity = float("inf")
             self.loss_track = {"netG": [], "netD": []}
@@ -250,10 +252,12 @@ class Trainer:
                 generated_hr, kwargs["real_labels"]
             )
 
-            real_features = self.content_loss(kwargs["hr_images"])
-            fake_features = self.content_loss(generated_hr)
+            real_features = self.criterion_content(kwargs["hr_images"])
+            fake_features = self.criterion_content(generated_hr)
 
-            content_loss = 1e-3 * torch.abs(real_features - fake_features).mean()
+            content_loss = (
+                self.content_loss * torch.abs(real_features - fake_features).mean()
+            )
 
             total_loss = adversarial_loss + content_loss
 
