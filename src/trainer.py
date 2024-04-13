@@ -354,14 +354,11 @@ class Trainer:
 
 if __name__ == "__main__":
     trainer = Trainer(
-        epochs=1,
-        lr=1e-4,
+        epochs=5,
+        lr=0.0002,
         device="mps",
         adam=True,
         SGD=False,
         beta1=0.5,
-        is_lr_scheduler=True,
     )
     trainer.train()
-
-    print(trainer.netD)

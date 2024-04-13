@@ -27,7 +27,14 @@ class Loader(Dataset):
         image_size (int): Size to which input images are resized.
     """
 
-    def __init__(self, image_path=None, in_channels=3, batch_size=1, image_size=64):
+    def __init__(
+        self,
+        image_path=None,
+        in_channels=3,
+        batch_size=1,
+        image_size=64,
+        is_sub_samples=False,
+    ):
         """
         Initializes the Loader with specified configurations for image preprocessing and DataLoader creation.
 
@@ -41,6 +48,7 @@ class Loader(Dataset):
         self.batch_size = batch_size
         self.in_channels = in_channels
         self.image_size = image_size
+        self.is_sub_samples = is_sub_samples
 
         self.train_images = list()
         self.train_labels = list()
@@ -101,6 +109,37 @@ class Loader(Dataset):
             Image.fromarray(kwargs["images"])
         )
 
+    def get_subsample_of_dataloader(self):
+        """
+        Reduces the size of the data loaders by subsampling the datasets. The training data is reduced to 20% of its
+        original size, and the testing data is reduced to 50% of its original size.
+
+        This method modifies the internal state of the class by updating the train and test datasets to their new, smaller sizes.
+
+        Returns:
+            dict: A dictionary containing the subsampled datasets:
+                  - 'train_images': Subsampled training images.
+                  - 'train_labels': Subsampled training labels.
+                  - 'test_images': Subsampled testing images.
+                  - 'test_labels': Subsampled testing labels.
+        """
+
+        train_samples = len(self.train_images) // 5
+        test_samples = len(self.test_images) // 2
+
+        self.train_images = self.train_images[:train_samples]
+        self.train_labels = self.train_labels[:train_samples]
+
+        self.test_images = self.test_images[:test_samples]
+        self.test_labels = self.test_labels[:test_samples]
+
+        return {
+            "train_images": self.train_images,
+            "train_labels": self.train_labels,
+            "test_images": self.test_images,
+            "test_labels": self.test_labels,
+        }
+
     def extract_images(self):
         """
         Extracts and processes images from the specified directory, splitting them into training and testing datasets.
@@ -151,11 +190,15 @@ class Loader(Dataset):
                                 )
                         else:
                             continue
+
+            if self.is_sub_samples:
+                self.images = self.get_subsample_of_dataloader()
+
             return {
-                "train_images": self.train_images,
-                "train_labels": self.train_labels,
-                "test_images": self.test_images,
-                "test_labels": self.test_labels,
+                "train_images": self.images["train_images"],
+                "train_labels": self.images["train_labels"],
+                "test_images": self.images["test_images"],
+                "test_labels": self.images["test_labels"],
             }
         else:
             raise Exception("Raw data folder not found".capitalize())
@@ -167,8 +210,10 @@ class Loader(Dataset):
         """
         try:
             images = self.extract_images()
+
         except Exception as e:
             print("Error in extracting images".capitalize())
+
         else:
             train_dataloader = DataLoader(
                 dataset=list(zip(images["train_images"], images["train_labels"])),
@@ -317,6 +362,12 @@ if __name__ == "__main__":
     parser.add_argument(
         "--image_size", type=int, help="Image size for the dataloader".capitalize()
     )
+    parser.add_argument(
+        "--is_sub_samples",
+        type=bool,
+        default=False,
+        help="Image size for the dataloader".capitalize(),
+    )
 
     args = parser.parse_args()
 
@@ -325,6 +376,7 @@ if __name__ == "__main__":
             image_path=args.image_path,
             batch_size=args.batch_size,
             image_size=args.image_size,
+            is_sub_samples=args.is_sub_samples,
         )
         try:
             loader.unzip_folder()
