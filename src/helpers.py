@@ -47,10 +47,12 @@ def helper(**kwargs):
     Returns:
         dict: A dictionary containing initialized components including models, dataloaders, optimizers, schedulers, and loss functions.
     """
+    netG = netD = optimizerG = optimizerD = schedulerG = schedulerD = None
+
     lr = kwargs["lr"]
     beta1 = kwargs["beta1"]
     adam = kwargs["adam"]
-    SGD = kwargs["SDG"]
+    SGD = kwargs["SGD"]
     device = kwargs["device"]
     lr_scheduler = kwargs["is_lr_scheduler"]
 

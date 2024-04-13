@@ -1,15 +1,22 @@
+import sys
+import argparse
 import torch
 import torch.nn as nn
 
+sys.path.append("src/")
 
-class Trainer(nn.Module):
+from helpers import helper
+from utils import weight_int
+
+
+class Trainer:
     def __init__(
         self,
         epochs=100,
         lr=0.0002,
         device="mps",
         adam=True,
-        SDG=False,
+        SGD=False,
         beta1=0.5,
         is_l1=False,
         is_l2=False,
@@ -21,13 +28,48 @@ class Trainer(nn.Module):
         self.lr = lr
         self.device = device
         self.adam = adam
-        self.SDG = SDG
+        self.SGD = SGD
         self.beta1 = beta1
         self.is_l1 = is_l1
         self.is_l2 = is_l2
         self.is_elastic_net = is_elastic_net
         self.is_lr_scheduler = is_lr_scheduler
         self.display = display
+
+        try:
+            init = helper(
+                lr=self.lr,
+                beta1=self.beta1,
+                adam=self.adam,
+                SGD=self.SGD,
+                device=self.device,
+                is_lr_scheduler=self.is_lr_scheduler,
+            )
+        except Exception as e:
+            print("The exception caught in the section # {}".format(e).capitalize())
+
+        else:
+            self.train_dataloader = init["train_dataloader"]
+            self.test_dataloader = init["test_dataloader"]
+
+            try:
+                self.netG = init["netG"]
+                self.netD = init["netD"]
+
+            except Exception as e:
+                print("The exception caught in the section # {}".format(e).capitalize())
+
+            finally:
+
+                self.netG = self.netG.apply(weight_int)
+                self.netD = self.netD.apply(weight_int)
+
+            self.optimizerG = init["optimizerG"]
+            self.optimizerD = init["optimizerD"]
+            self.schedulerG = init["schedulerG"]
+            self.schedulerD = init["schedulerD"]
+            self.adversarial_loss = init["adversarial_loss"]
+            self.content_loss = init["content_loss"]
 
     def l1(self, model):
         """
@@ -112,3 +154,18 @@ class Trainer(nn.Module):
     @staticmethod
     def plot_history():
         pass
+
+
+if __name__ == "__main__":
+    trainer = Trainer(
+        epochs=1,
+        lr=1e-4,
+        device="mps",
+        adam=True,
+        SGD=False,
+        beta1=0.5,
+        is_lr_scheduler=True,
+    )
+    trainer.train()
+
+    print(trainer.netD)
