@@ -1,51 +1,58 @@
-# import pandas as pd
+# # import pandas as pd
 
-# print(
-#     pd.DataFrame(
-#         {
-#             "Train": [1200],
-#             "test": [1000],
-#         },
-#         index=["quantity", "quan"],
-#     ).transpose()
+# # print(
+# #     pd.DataFrame(
+# #         {
+# #             "Train": [1200],
+# #             "test": [1000],
+# #         },
+# #         index=["quantity", "quan"],
+# #     ).transpose()
+# # )
+
+
+# import torch
+# import sys
+# import matplotlib.pyplot as plt
+
+# sys.path.append("src/")
+
+# from generator import Generator
+
+# from utils import load
+
+# data = load(
+#     filename="/Users/shahmuhammadraditrahman/Desktop/SRGAN/data/processed/test_dataloader.pkl"
 # )
 
+# lr, hr = next(iter(data))
 
-import torch
-import sys
-import matplotlib.pyplot as plt
+# load_state = torch.load(
+#     "/Users/shahmuhammadraditrahman/Desktop/SRGAN/checkpoints/train_models/netG100.pth"
+# )
 
-sys.path.append("src/")
+# # print(load_state["netG"])
 
-from generator import Generator
+# netG = Generator()
+# netG.load_state_dict(load_state["netG"])
 
-from utils import load
+# images = netG(lr)
 
-data = load(
-    filename="/Users/shahmuhammadraditrahman/Desktop/SRGAN/data/processed/train_dataloader.pkl"
-)
+# plt.figure(figsize=(10, 10))
+# for index, image in enumerate(images):
+#     plt.subplot(8, 8, index + 1)
+#     img = image.permute(1, 2, 0).squeeze().detach().numpy()
+#     img = (img - img.min()) / (img.max() - img.min())
+#     plt.imshow(img, cmap="gray")
+#     plt.axis("off")
 
-lr, hr = next(iter(data))
 
-load_state = torch.load(
-    "/Users/shahmuhammadraditrahman/Desktop/SRGAN/checkpoints/train_models/netG49.pth"
-)
+# plt.tight_layout()
+# plt.show()
+# # image = images[0].permute(1, 2, 0).squeeze().detach().numpy()
+# # image = (image - image.min()) / (image.max() - image.min())
 
-# print(load_state["netG"])
+# # print(image.shape)
 
-netG = Generator()
-netG.load_state_dict(load_state["netG"])
-
-images = netG(lr)
-
-lr1 = lr[0].permute(1, 2, 0).squeeze().detach().numpy
-
-# print(lr.shape)
-
-image = images[0].permute(1, 2, 0).squeeze().detach().numpy()
-image = (image - image.min()) / (image.max() - image.min())
-
-print(image.shape)
-
-plt.imshow(image, cmap="gray")
-plt.show()
+# # plt.imshow(image, cmap="gray")
+# # plt.show()

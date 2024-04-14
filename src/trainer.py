@@ -3,6 +3,7 @@ import os
 import argparse
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
 from tqdm import tqdm
@@ -14,9 +15,16 @@ warnings.filterwarnings("ignore")
 
 sys.path.append("src/")
 
-from config import TRAIN_MODELS, BEST_MODELS, BEST_MODEL, TRAIN_IMAGES
+from config import (
+    TRAIN_MODELS,
+    BEST_MODELS,
+    BEST_MODEL,
+    TRAIN_IMAGES,
+    METRICS_PATH,
+    MODEL_HISTORY,
+)
 from helpers import helper
-from utils import weight_init
+from utils import weight_init, dump, load
 
 import warnings
 
@@ -56,6 +64,7 @@ class Trainer:
         is_l2=False,
         is_elastic_net=False,
         is_lr_scheduler=False,
+        is_weight_init=False,
         display=True,
     ):
         """
@@ -86,7 +95,8 @@ class Trainer:
         self.is_l2 = is_l2
         self.is_elastic_net = is_elastic_net
         self.is_lr_scheduler = is_lr_scheduler
-        self.display = display
+        self.is_weight_init = is_weight_init
+        self.is_display = display
 
         try:
             init = helper(
@@ -104,11 +114,13 @@ class Trainer:
             self.train_dataloader = init["train_dataloader"]
             self.test_dataloader = init["test_dataloader"]
 
-            # self.netG = init["netG"].apply(weight_init)
-            # self.netD = init["netD"].apply(weight_init)
+            if self.is_weight_init:
+                self.netG = init["netG"].apply(weight_init)
+                self.netD = init["netD"].apply(weight_init)
 
-            self.netG = init["netG"]
-            self.netD = init["netD"]
+            else:
+                self.netG = init["netG"]
+                self.netD = init["netD"]
 
             self.optimizerG = init["optimizerG"]
             self.optimizerD = init["optimizerD"]
@@ -118,7 +130,8 @@ class Trainer:
             self.criterion_content = init["criterion_loss"]
 
             self.infinity = float("inf")
-            self.loss_track = {"netG": [], "netD": []}
+            self.loss_track = {"netG": list(), "netD": list()}
+            self.history = {"netG": list(), "netD": list()}
 
     def l1(self, model):
         """
@@ -282,11 +295,40 @@ class Trainer:
         else:
             return loss.item()
 
-    def save_training_images(self):
-        pass
+    def save_training_images(self, **kwargs):
+        lr_images, hr_images = next(iter(self.test_dataloader))
+        lr_images = lr_images.to(self.device)
+        hr_images = hr_images.to(self.device)
+
+        generated_hr_images = self.netG(lr_images[0:8])
+
+        if os.path.exists(TRAIN_IMAGES):
+            save_image(
+                generated_hr_images,
+                os.path.join(TRAIN_IMAGES, "train_{}.png".format(kwargs["epoch"] + 1)),
+                nrow=4,
+                normalize=True,
+            )
+        else:
+            raise FileExistsError("The directory should be created".capitalize())
 
     def show_progress(self, **kwargs):
-        pass
+        if self.is_display:
+            print(
+                "Epochs - [{}/{}] - train_netG_loss: {:.5f} - train_netD_loss: {:.5f} - test_loss: {:.5f}".format(
+                    kwargs["epoch"] + 1,
+                    kwargs["epochs"],
+                    np.mean(kwargs["netG_loss"]),
+                    np.mean(kwargs["netD_loss"]),
+                    np.mean(kwargs["test_loss"]),
+                )
+            )
+        else:
+            print(
+                "Epochs - [{}/{}] is completed".format(
+                    kwargs["epoch"] + 1, kwargs["epochs"]
+                )
+            )
 
     def train(self):
         warnings.filterwarnings("ignore")
@@ -337,49 +379,63 @@ class Trainer:
                 print("The exception caught in # {}".format(e).capitalize())
 
             else:
-                lr_images, hr_images = next(iter(self.test_dataloader))
-                lr_images = lr_images.to(self.device)
-                hr_images = hr_images.to(self.device)
+                self.save_training_images(epoch=epoch + 1)
 
-                generated_hr_images = self.netG(lr_images[0:8])
-
-                if os.path.exists(TRAIN_IMAGES):
-                    save_image(
-                        generated_hr_images,
-                        os.path.join(TRAIN_IMAGES, "train_{}.png".format(epoch + 1)),
-                        nrow=4,
-                    )
-                else:
-                    raise FileExistsError(
-                        "The directory should be created".capitalize()
-                    )
-
-            print(
-                "Epochs - [{}/{}] - train_netG_loss: {:.5f} - train_netD_loss: {:.5f} - test_loss: {:.5f}".format(
-                    epoch + 1,
-                    self.epochs,
-                    np.mean(self.netG_loss),
-                    np.mean(self.netD_loss),
-                    np.mean(self.test_loss),
+            finally:
+                self.show_progress(
+                    epoch=epoch + 1,
+                    epochs=self.epochs,
+                    netG_loss=np.array(self.netG_loss).mean(),
+                    netD_loss=np.array(self.netD_loss).mean(),
+                    test_loss=np.array(self.test_loss).mean(),
                 )
-            )
+        try:
+            self.history["netG"].append(np.mean(self.netG_loss))
+            self.history["netD"].append(np.mean(self.netD_loss))
 
-        # try:
-        #     print(pd.DataFrame(self.loss_track))
+            if os.path.exists(MODEL_HISTORY):
+                pd.DataFrame(self.loss_track).to_csv(
+                    os.path.join(MODEL_HISTORY, "history.csv")
+                )
+            else:
+                raise FileExistsError("The directory should be created".capitalize())
 
-        # except Exception as e:
-        #     print("The exception caught in # {}".format(e).capitalize())
+        except Exception as e:
+            print("The exception caught in # {}".format(e).capitalize())
+        else:
+            if os.path.exists(METRICS_PATH):
+                dump(
+                    value=self.history,
+                    filename=os.path.join(METRICS_PATH, "history.pkl"),
+                )
+            else:
+                raise FileExistsError(
+                    "The directory should be created (Model History)".capitalize()
+                )
 
     @staticmethod
     def plot_history():
-        pass
+        if os.path.exists(METRICS_PATH):
+            history = load(filename=os.path.join(METRICS_PATH, "history.pkl"))
+
+            plt.plot(history["netG"], label="netG_loss")
+            plt.plot(history["netD"], label="netD_loss")
+            plt.legend()
+            plt.xlabel("Epochs".capitalize())
+            plt.ylabel("Loss".capitalize())
+            plt.show()
+
+        else:
+            raise FileExistsError(
+                "The directory should be created (Model History)".capitalize()
+            )
 
 
 if __name__ == "__main__":
     trainer = Trainer(
-        epochs=100,
+        epochs=2,
         lr=0.0002,
-        content_loss=0.001,
+        content_loss=1e-3,
         device="mps",
         adam=True,
         SGD=False,
