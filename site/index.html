@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="description" content="None" />
+      <link rel="shortcut icon" href="img/favicon.ico" />
+    <title>Super-Resolution Generative Adversarial Networks</title>
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="assets/_mkdocstrings.css" rel="stylesheet" />
+        <link href="css/custom.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Home";
+        var mkdocs_page_input_path = "index.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="." class="icon icon-home"> Super-Resolution Generative Adversarial Networks
+        </a>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href=".">Home</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#features">Features</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#getting-started">Getting Started</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#installation-instructions">Installation Instructions</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#project-structure">Project Structure</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#dataset-organization-for-srgan">Dataset Organization for srgan</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#directory-structure">Directory Structure:</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#command-line-interface">Command Line Interface</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#cli-arguments">CLI Arguments</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#cli-command-examples">CLI Command Examples</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#trainer">Trainer</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#inference">Inference</a>
+    </li>
+        </ul>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#contributing">Contributing</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#license">License</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="dataloader/">DataLoader</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="netD_helpers/">netD_helpers</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="netG_helpers/">netG_helpers</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="generator/">Generator</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="discriminator/">Discriminator</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="trainer/">Trainer</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="Charts/">Charts</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="Inference/">Inference</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="cli/">CLI</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="custom_modules/">Custom Modules</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href=".">Super-Resolution Generative Adversarial Networks</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Home</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="super-resolution-gan-sr-gan-project">Super-Resolution GAN (SR-GAN) Project</h1>
+<p>This project provides a complete framework for training and testing a Super-Resolution Generative Adversarial Network (SR-GAN). It includes functionality for data preparation, model training, testing, and inference to enhance low-resolution images to high-resolution.</p>
+<p><img src="https://media.springernature.com/full/springer-static/image/art%3A10.1038%2Fs41524-022-00749-z/MediaObjects/41524_2022_749_Fig1_HTML.png" alt="AC-GAN - Medical Image Dataset Generator: Generated Image with labels"></p>
+<h2 id="features">Features</h2>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Efficient Implementation</strong></td>
+<td>Utilizes an optimized SRGAN model architecture for superior performance on diverse image segmentation tasks.</td>
+</tr>
+<tr>
+<td><strong>Custom Dataset Support</strong></td>
+<td>Features easy-to-use data loading utilities that seamlessly accommodate custom datasets, requiring minimal configuration.</td>
+</tr>
+<tr>
+<td><strong>Training and Testing Scripts</strong></td>
+<td>Provides streamlined scripts for both training and testing phases, simplifying the end-to-end workflow.</td>
+</tr>
+<tr>
+<td><strong>Visualization Tools</strong></td>
+<td>Equipped with tools for tracking training progress and visualizing segmentation outcomes, enabling clear insight into model effectiveness.</td>
+</tr>
+<tr>
+<td><strong>Custom Training via CLI</strong></td>
+<td>Offers a versatile command-line interface for personalized training configurations, enhancing flexibility in model training.</td>
+</tr>
+<tr>
+<td><strong>Import Modules</strong></td>
+<td>Supports straightforward integration into various projects or workflows with well-documented Python modules, simplifying the adoption of SRGAN functionality.</td>
+</tr>
+<tr>
+<td><strong>Multi-Platform Support</strong></td>
+<td>Guarantees compatibility with various computational backends, including MPS for GPU acceleration on Apple devices, CPU, and CUDA for Nvidia GPU acceleration, ensuring adaptability across different hardware setups.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="getting-started">Getting Started</h2>
+<h2 id="installation-instructions">Installation Instructions</h2>
+<p>Follow these steps to get the project set up on your local machine:</p>
+<table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Instruction</th>
+<th>Command</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Clone this repository to your local machine.</td>
+<td><strong>git clone https://github.com/atikul-islam-sajib/SRGAN.git</strong></td>
+</tr>
+<tr>
+<td>2</td>
+<td>Navigate into the project directory.</td>
+<td><strong>cd SRGAN</strong></td>
+</tr>
+<tr>
+<td>3</td>
+<td>Install the required Python packages.</td>
+<td><strong>pip install -r requirements.txt</strong></td>
+</tr>
+</tbody>
+</table>
+<h2 id="project-structure">Project Structure</h2>
+<p>This project is thoughtfully organized to support the development, training, and evaluation of the srgan model efficiently. Below is a concise overview of the directory structure and their specific roles:</p>
+<ul>
+<li><strong>checkpoints/</strong></li>
+<li>Stores model checkpoints during training for later resumption.</li>
+<li>
+<p><strong>best_model/</strong></p>
+</li>
+<li>
+<p>Contains the best-performing model checkpoints as determined by validation metrics.</p>
+</li>
+<li>
+<p><strong>train_models/</strong></p>
+</li>
+<li>
+<p>Houses all model checkpoints generated throughout the training process.</p>
+</li>
+<li>
+<p><strong>data/</strong></p>
+</li>
+<li>
+<p><strong>processed/</strong>: Processed data ready for modeling, having undergone normalization, augmentation, or encoding.</p>
+</li>
+<li>
+<p><strong>raw/</strong>: Original, unmodified data serving as the baseline for all preprocessing.</p>
+</li>
+<li>
+<p><strong>logs/</strong></p>
+</li>
+<li>
+<p><strong>Log</strong> files for debugging and tracking model training progress.</p>
+</li>
+<li>
+<p><strong>metrics/</strong></p>
+</li>
+<li>
+<p>Files related to model performance metrics for evaluation purposes.</p>
+</li>
+<li>
+<p><strong>outputs/</strong></p>
+</li>
+<li>
+<p><strong>test_images/</strong>: Images generated during the testing phase, including segmentation outputs.</p>
+</li>
+<li><strong>train_gif/</strong>: GIFs compiled from training images showcasing the model's learning progress.</li>
+<li>
+<p><strong>train_images/</strong>: Images generated during training for performance visualization.</p>
+</li>
+<li>
+<p><strong>research/</strong></p>
+</li>
+<li>
+<p><strong>notebooks/</strong>: Jupyter notebooks for research, experiments, and exploratory analyses conducted during the project.</p>
+</li>
+<li>
+<p><strong>src/</strong></p>
+</li>
+<li>
+<p>Source code directory containing all custom modules, scripts, and utility functions for the U-Net model.</p>
+</li>
+<li>
+<p><strong>unittest/</strong></p>
+</li>
+<li>Unit tests ensuring code reliability, correctness, and functionality across various project components.</li>
+</ul>
+<h3 id="dataset-organization-for-srgan">Dataset Organization for srgan</h3>
+<p>The dataset is organized into three categories for SRGAN. Each category directly contains paired images and their corresponding lower resolution images and higher resolution, stored together to simplify the association between lower resolution and higher resolution images .</p>
+<h2 id="directory-structure">Directory Structure:</h2>
+<pre><code>images/
+├── Training/
+│ │ ├── 1.png
+│ │ ├── 2.png
+│ │ ├── ...
+├── Testing/
+│ │ ├── 1.png
+│ │ ├── 2.png
+│ │ ├── ...
+</code></pre>
+<h3 id="command-line-interface">Command Line Interface</h3>
+<p>The project is controlled via a command line interface (CLI) which allows for running different operational modes such as training, testing, and inference.</p>
+<h4 id="cli-arguments">CLI Arguments</h4>
+<table>
+<thead>
+<tr>
+<th>Argument</th>
+<th>Description</th>
+<th>Type</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--image_path</code></td>
+<td>Path to the image dataset</td>
+<td>str</td>
+<td>None</td>
+</tr>
+<tr>
+<td><code>--batch_size</code></td>
+<td>Number of images per batch</td>
+<td>int</td>
+<td>1</td>
+</tr>
+<tr>
+<td><code>--image_size</code></td>
+<td>Size to resize images to</td>
+<td>int</td>
+<td>64</td>
+</tr>
+<tr>
+<td><code>--is_sub_samples</code></td>
+<td>Whether to subsample the dataset</td>
+<td>bool</td>
+<td>False</td>
+</tr>
+<tr>
+<td><code>--epochs</code></td>
+<td>Number of training epochs</td>
+<td>int</td>
+<td>100</td>
+</tr>
+<tr>
+<td><code>--lr</code></td>
+<td>Learning rate</td>
+<td>float</td>
+<td>0.0002</td>
+</tr>
+<tr>
+<td><code>--content_loss</code></td>
+<td>Weight of content loss</td>
+<td>float</td>
+<td>0.001</td>
+</tr>
+<tr>
+<td><code>--is_l1</code></td>
+<td>Enable L1 regularization</td>
+<td>bool</td>
+<td>False</td>
+</tr>
+<tr>
+<td><code>--is_l2</code></td>
+<td>Enable L2 regularization</td>
+<td>bool</td>
+<td>False</td>
+</tr>
+<tr>
+<td><code>--is_elastic_net</code></td>
+<td>Enable Elastic Net regularization</td>
+<td>bool</td>
+<td>False</td>
+</tr>
+<tr>
+<td><code>--is_lr_scheduler</code></td>
+<td>Enable learning rate scheduler</td>
+<td>bool</td>
+<td>False</td>
+</tr>
+<tr>
+<td><code>--is_weight_init</code></td>
+<td>Apply weight initialization</td>
+<td>bool</td>
+<td>False</td>
+</tr>
+<tr>
+<td><code>--is_weight_clip</code></td>
+<td>Apply weight clipping; specify magnitude</td>
+<td>float</td>
+<td>0.01</td>
+</tr>
+<tr>
+<td><code>--is_display</code></td>
+<td>Display detailed loss information</td>
+<td>bool</td>
+<td>False</td>
+</tr>
+<tr>
+<td><code>--device</code></td>
+<td>Computation device ('cuda', 'mps', 'cpu')</td>
+<td>str</td>
+<td>'mps'</td>
+</tr>
+<tr>
+<td><code>--adam</code></td>
+<td>Use Adam optimizer</td>
+<td>bool</td>
+<td>True</td>
+</tr>
+<tr>
+<td><code>--SGD</code></td>
+<td>Use Stochastic Gradient Descent optimizer</td>
+<td>bool</td>
+<td>False</td>
+</tr>
+<tr>
+<td><code>--beta1</code></td>
+<td>Beta1 parameter for Adam optimizer</td>
+<td>float</td>
+<td>0.5</td>
+</tr>
+<tr>
+<td><code>--train</code></td>
+<td>Flag to initiate training mode</td>
+<td>action</td>
+<td>N/A</td>
+</tr>
+<tr>
+<td><code>--model</code></td>
+<td>Path to a saved model for testing</td>
+<td>str</td>
+<td>None</td>
+</tr>
+<tr>
+<td><code>--test</code></td>
+<td>Flag to initiate testing mode</td>
+<td>action</td>
+<td>N/A</td>
+</tr>
+<tr>
+<td><code>--single</code></td>
+<td>Flag for single image inference</td>
+<td>action</td>
+<td>N/A</td>
+</tr>
+<tr>
+<td><code>--batch</code></td>
+<td>Flag for batch image inference</td>
+<td>action</td>
+<td>N/A</td>
+</tr>
+</tbody>
+</table>
+<h3 id="cli-command-examples">CLI Command Examples</h3>
+<table>
+<thead>
+<tr>
+<th>Task</th>
+<th>Command</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Training a Model</strong></td>
+<td><strong>python main.py --train --image_path "/path/to/dataset" --batch_size 32 --image_size 128 --epochs 50 --lr 0.001 --content_loss 0.01 --adam True --is_l1 True --device "cuda"</strong></td>
+</tr>
+<tr>
+<td><strong>Testing a Model</strong></td>
+<td><strong>python main.py --test --model "/path/to/saved_model.pth" --device "cuda"</strong></td>
+</tr>
+<tr>
+<td><strong>Single Image Inference</strong></td>
+<td><strong>python main.py --single --image "/path/to/image.jpg" --model "/path/to/saved_model.pth" --device "cuda"</strong></td>
+</tr>
+<tr>
+<td><strong>Batch Image Inference</strong></td>
+<td><strong>python main.py --batch --model "/path/to/saved_model.pth" --device "cuda"</strong></td>
+</tr>
+</tbody>
+</table>
+<pre><code>
+### Custom Modules
+
+#### Loader
+
+Initialize and prepare the DataLoader:
+
+```python
+loader = Loader(image_path=&quot;path/to/images.zip&quot;, batch_size=16, image_size=128, is_sub_samples=True)
+loader.unzip_folder()
+loader.create_dataloader()
+</code></pre>
+<h4 id="trainer">Trainer</h4>
+<p>Configure and run the training process:</p>
+<pre><code class="language-python">trainer = Trainer(
+    epochs=200,
+    lr=0.0001,
+    content_loss=0.01,
+    device='cuda',
+    is_display=True,
+    is_weight_init=True,
+    is_lr_scheduler=True
+)
+trainer.train()
+</code></pre>
+<h4 id="inference">Inference</h4>
+<p>Perform inference with a trained model:</p>
+<pre><code class="language-python">inference = Inference(image=&quot;path/to/test_image.jpg&quot;, model=&quot;path/to/best_model.pth&quot;, device='cuda')
+inference.srgan_single()  # For single image
+inference.srgan_batch()   # For batch processing
+</code></pre>
+<h2 id="contributing">Contributing</h2>
+<p>Contributions to improve this implementation of SRGAN are welcome. Please follow the standard fork-branch-pull request workflow.</p>
+<h2 id="license">License</h2>
+<p>Specify the license under which the project is made available (e.g., MIT License).</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="dataloader/" class="btn btn-neutral float-right" title="DataLoader">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+    
+      <span><a href="dataloader/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = ".";</script>
+    <script src="js/theme_extra.js"></script>
+    <script src="js/theme.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
+
+<!--
+MkDocs version : 1.5.3
+Build Date UTC : 2024-04-14 19:17:13.261090+00:00
+-->

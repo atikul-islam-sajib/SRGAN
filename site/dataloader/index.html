@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>DataLoader - Super-Resolution Generative Adversarial Networks</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../assets/_mkdocstrings.css" rel="stylesheet" />
+        <link href="../css/custom.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "DataLoader";
+        var mkdocs_page_input_path = "dataloader.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Super-Resolution Generative Adversarial Networks
+        </a>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="./">DataLoader</a>
+    <ul class="current">
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../netD_helpers/">netD_helpers</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../netG_helpers/">netG_helpers</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../generator/">Generator</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../discriminator/">Discriminator</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../trainer/">Trainer</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../Charts/">Charts</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../Inference/">Inference</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../cli/">CLI</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../custom_modules/">Custom Modules</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Super-Resolution Generative Adversarial Networks</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">DataLoader</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h3 id="dataloader">DataLoader</h3>
+<h2 id="parameters-for-loader-class">Parameters for Loader Class</h2>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>image_path</code></td>
+<td>str</td>
+<td>None</td>
+<td>Specifies the path to a zip file containing the images. This zip file will be processed to extract images for training and testing.</td>
+</tr>
+<tr>
+<td><code>in_channels</code></td>
+<td>int</td>
+<td>3</td>
+<td>Indicates the number of channels in the input images, typical for color images (RGB) which have three channels.</td>
+</tr>
+<tr>
+<td><code>batch_size</code></td>
+<td>int</td>
+<td>1</td>
+<td>Determines the number of images to be processed in a single batch. This affects both memory usage and training speed.</td>
+</tr>
+<tr>
+<td><code>image_size</code></td>
+<td>int</td>
+<td>64</td>
+<td>Defines the size to which each image will be resized. This uniform size is necessary for processing through the neural network.</td>
+</tr>
+<tr>
+<td><code>is_sub_samples</code></td>
+<td>bool</td>
+<td>False</td>
+<td>A flag to determine whether the dataset should be subsampled to a smaller size, useful for quick tests or debugging with reduced computational requirements.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="method-descriptions-for-loader-class">Method Descriptions for Loader Class</h3>
+<p>In addition to the parameters, it's helpful to outline key methods within the <code>Loader</code> class:</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>image_transforms()</code></td>
+<td>Sets up the transformations to be applied to each image, including resizing, tensor conversion, and normalization based on the given parameters.</td>
+</tr>
+<tr>
+<td><code>unzip_folder()</code></td>
+<td>Extracts images from a provided zip file to a specified directory for further processing.</td>
+</tr>
+<tr>
+<td><code>process_images()</code></td>
+<td>Applies the defined image transformations to preprocess the images before they are passed to the neural network.</td>
+</tr>
+<tr>
+<td><code>get_subsample_of_dataloader()</code></td>
+<td>Optionally reduces the size of the training and testing datasets based on the <code>is_sub_samples</code> flag.</td>
+</tr>
+<tr>
+<td><code>extract_images()</code></td>
+<td>Handles the extraction and preprocessing of images from the raw dataset directory into structured training and testing datasets.</td>
+</tr>
+<tr>
+<td><code>create_dataloader()</code></td>
+<td>Initializes PyTorch DataLoader objects with the processed datasets, ready for use in training or testing phases.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="usage-example-in-code">Usage Example in Code</h3>
+<p>Below is a sample Python script snippet that demonstrates initializing and using the <code>Loader</code> class:</p>
+<pre><code class="language-python">from loader import Loader
+
+# Initialize the Loader with the desired configuration
+image_loader = Loader(
+    image_path=&quot;path/to/your/image_data.zip&quot;,
+    in_channels=3,
+    batch_size=32,
+    image_size=128,
+    is_sub_samples=True
+)
+
+# Process the images and create data loaders
+image_loader.unzip_folder()
+image_loader.create_dataloader()
+
+# Optionally, display the processed images
+image_loader.display_images()
+</code></pre>
+<h1 id="srgan-loader-class-cli">SRGAN Loader Class - CLI</h1>
+<h2 id="overview">Overview</h2>
+<p>This README document provides detailed information about the command-line arguments and parameters for the SRGAN Loader class. The Loader class is designed for processing and creating data loaders for SRGAN training and testing datasets.</p>
+<h3 id="command-line-arguments">Command-Line Arguments</h3>
+<table>
+<thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--image_path</code></td>
+<td>str</td>
+<td>None</td>
+<td>Path to the zip file containing raw images.</td>
+</tr>
+<tr>
+<td><code>--batch_size</code></td>
+<td>int</td>
+<td>1</td>
+<td>Batch size for the DataLoader.</td>
+</tr>
+<tr>
+<td><code>--image_size</code></td>
+<td>int</td>
+<td>64</td>
+<td>Size to which input images are resized.</td>
+</tr>
+<tr>
+<td><code>--is_sub_samples</code></td>
+<td>bool</td>
+<td>False</td>
+<td>Whether to create a subsample of the dataset for tests.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="usage-examples">Usage Examples</h2>
+<h3 id="initializing-and-running-the-loader">Initializing and Running the Loader</h3>
+<p>To initialize the loader with specific parameters and process images:</p>
+<pre><code class="language-bash">python your_script.py --image_path &quot;./path/to/images.zip&quot; --batch_size 32 --image_size 128 --is_sub_samples True
+</code></pre>
+<h3 id="help-command">Help Command</h3>
+<p>To view all available options and their descriptions, you can use the help command:</p>
+<pre><code class="language-bash">python your_script.py --help
+</code></pre>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href=".." class="btn btn-neutral float-left" title="Home"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../netD_helpers/" class="btn btn-neutral float-right" title="netD_helpers">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href=".." style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../netD_helpers/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

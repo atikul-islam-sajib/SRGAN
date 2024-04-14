@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Discriminator - Super-Resolution Generative Adversarial Networks</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../assets/_mkdocstrings.css" rel="stylesheet" />
+        <link href="../css/custom.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Discriminator";
+        var mkdocs_page_input_path = "discriminator.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Super-Resolution Generative Adversarial Networks
+        </a>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../dataloader/">DataLoader</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../netD_helpers/">netD_helpers</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../netG_helpers/">netG_helpers</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../generator/">Generator</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="./">Discriminator</a>
+    <ul class="current">
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../trainer/">Trainer</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../Charts/">Charts</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../Inference/">Inference</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../cli/">CLI</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../custom_modules/">Custom Modules</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Super-Resolution Generative Adversarial Networks</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Discriminator</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h3 id="discriminator-class-description">Discriminator Class Description</h3>
+<ul>
+<li><strong>Purpose</strong>: Defines the Discriminator model for a GAN, particularly in applications like SRGAN, aimed at distinguishing real high-resolution images from artificially generated ones.</li>
+<li><strong>Components</strong>: Comprises an initial input block, several feature blocks, an adaptive max pooling layer, and a final output block.</li>
+</ul>
+<h3 id="attributes-and-parameters">Attributes and Parameters</h3>
+<table>
+<thead>
+<tr>
+<th>Attribute/Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>in_channels</code></td>
+<td>int</td>
+<td>Number of channels in the input images, typically 3 for RGB images.</td>
+</tr>
+<tr>
+<td><code>out_channels</code></td>
+<td>int</td>
+<td>Initial number of output channels which doubles in certain feature blocks.</td>
+</tr>
+<tr>
+<td><code>filters</code></td>
+<td>int</td>
+<td>Copy of <code>out_channels</code> for initialization purposes in the output block.</td>
+</tr>
+<tr>
+<td><code>layers</code></td>
+<td>list of <code>FeatureBlock</code></td>
+<td>Dynamically created list of feature blocks for feature extraction.</td>
+</tr>
+<tr>
+<td><code>input</code></td>
+<td><code>InputBlock</code></td>
+<td>Initial block to process the input image.</td>
+</tr>
+<tr>
+<td><code>features</code></td>
+<td><code>nn.Sequential</code></td>
+<td>Sequential container holding the feature blocks.</td>
+</tr>
+<tr>
+<td><code>avg_pool</code></td>
+<td><code>nn.AdaptiveMaxPool2d</code></td>
+<td>Adaptive pooling layer to reduce spatial dimensions to 1x1.</td>
+</tr>
+<tr>
+<td><code>output</code></td>
+<td><code>OutputBlock</code></td>
+<td>Final block to classify the input as real or fake.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="custom-modules-utilized">Custom Modules Utilized</h3>
+<ul>
+<li><code>InputBlock</code></li>
+<li><code>FeatureBlock</code></li>
+<li><code>OutputBlock</code></li>
+</ul>
+<p>These modules are integral to the discriminator’s architecture, handling various stages of feature processing and classification.</p>
+<h3 id="command-line-interface-cli">Command-Line Interface (CLI)</h3>
+<p>The CLI allows for easy testing and demonstration of the Discriminator's functionality by specifying model parameters and triggering model instantiation.</p>
+<table>
+<thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--in_channels</code></td>
+<td>int</td>
+<td>3</td>
+<td>Number of input channels.</td>
+</tr>
+<tr>
+<td><code>--out_channels</code></td>
+<td>int</td>
+<td>64</td>
+<td>Initial number of output channels.</td>
+</tr>
+<tr>
+<td><code>--netD</code></td>
+<td>flag</td>
+<td>-</td>
+<td>Flag to initiate a test of the discriminator.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="example-usage">Example Usage</h3>
+<p>To run the discriminator from the command line, specifying the number of input and output channels and testing the model instantiation:</p>
+<pre><code class="language-bash">python discriminator_demo.py --in_channels 3 --out_channels 64 --netD
+</code></pre>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../generator/" class="btn btn-neutral float-left" title="Generator"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../trainer/" class="btn btn-neutral float-right" title="Trainer">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../generator/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../trainer/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

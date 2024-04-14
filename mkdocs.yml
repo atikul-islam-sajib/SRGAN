@@ -1,0 +1,20 @@
+site_name: Super-Resolution Generative Adversarial Networks
+nav:
+  - Home: index.md
+  - DataLoader: dataloader.md
+  - netD_helpers: netD_helpers.md
+  - netG_helpers: netG_helpers.md
+  - Generator: generator.md
+  - Discriminator: discriminator.md
+  - Trainer: trainer.md
+  - Charts: Charts.md
+  - Inference: Inference.md
+  - CLI: cli.md
+  - Custom Modules: custom_modules.md
+
+theme: readthedocs
+plugins:
+  - mkdocstrings
+
+extra_css:
+  - css/custom.css

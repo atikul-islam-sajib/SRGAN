@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Trainer - Super-Resolution Generative Adversarial Networks</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../assets/_mkdocstrings.css" rel="stylesheet" />
+        <link href="../css/custom.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Trainer";
+        var mkdocs_page_input_path = "trainer.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Super-Resolution Generative Adversarial Networks
+        </a>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../dataloader/">DataLoader</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../netD_helpers/">netD_helpers</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../netG_helpers/">netG_helpers</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../generator/">Generator</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../discriminator/">Discriminator</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="./">Trainer</a>
+    <ul class="current">
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../Charts/">Charts</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../Inference/">Inference</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../cli/">CLI</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../custom_modules/">Custom Modules</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Super-Resolution Generative Adversarial Networks</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Trainer</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h3 id="trainer-class-overview">Trainer Class Overview</h3>
+<p><strong>Purpose:</strong> Manages and conducts training sessions for Generative Adversarial Networks (GANs), specifically handling model setups, training loops, regularization, and learning rate adjustments.</p>
+<h3 id="attributes-and-parameters">Attributes and Parameters</h3>
+<table>
+<thead>
+<tr>
+<th>Attribute/Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>epochs</code></td>
+<td>int</td>
+<td>Total number of epochs to train the models.</td>
+</tr>
+<tr>
+<td><code>lr</code></td>
+<td>float</td>
+<td>Learning rate for the optimizers.</td>
+</tr>
+<tr>
+<td><code>content_loss</code></td>
+<td>float</td>
+<td>Coefficient for the content loss, applied to the generator's output.</td>
+</tr>
+<tr>
+<td><code>device</code></td>
+<td>str</td>
+<td>Computation device ('cuda', 'mps', 'cpu') where the model will be trained.</td>
+</tr>
+<tr>
+<td><code>adam</code></td>
+<td>bool</td>
+<td>Flag to use Adam optimizer; mutually exclusive with SGD.</td>
+</tr>
+<tr>
+<td><code>SGD</code></td>
+<td>bool</td>
+<td>Flag to use Stochastic Gradient Descent optimizer; mutually exclusive with Adam.</td>
+</tr>
+<tr>
+<td><code>beta1</code></td>
+<td>float</td>
+<td>Beta1 hyperparameter for Adam optimizer, affecting the decay rate of the first moment.</td>
+</tr>
+<tr>
+<td><code>is_l1</code></td>
+<td>bool</td>
+<td>Enables L1 regularization if set to True.</td>
+</tr>
+<tr>
+<td><code>is_l2</code></td>
+<td>bool</td>
+<td>Enables L2 regularization if set to True.</td>
+</tr>
+<tr>
+<td><code>is_elastic_net</code></td>
+<td>bool</td>
+<td>Enables Elastic Net regularization (combination of L1 and L2) if set to True.</td>
+</tr>
+<tr>
+<td><code>is_lr_scheduler</code></td>
+<td>bool</td>
+<td>Enables a learning rate scheduler if set to True.</td>
+</tr>
+<tr>
+<td><code>is_weight_init</code></td>
+<td>bool</td>
+<td>Applies custom weight initialization to models if set to True.</td>
+</tr>
+<tr>
+<td><code>is_weight_clip</code></td>
+<td>bool</td>
+<td>Applies weight clipping to the discriminator during training to stabilize training.</td>
+</tr>
+<tr>
+<td><code>display</code></td>
+<td>bool</td>
+<td>Controls whether to display detailed training progress and loss information.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="custom-modules-utilized">Custom Modules Utilized</h3>
+<ul>
+<li><code>InputBlock</code></li>
+<li><code>FeatureBlock</code></li>
+<li><code>OutputBlock</code></li>
+<li>Various utility functions from <code>helpers.py</code> and <code>utils.py</code> for loading data, applying transformations, and initializing weights.</li>
+</ul>
+<h3 id="command-line-interface-cli-options">Command-Line Interface (CLI) Options</h3>
+<table>
+<thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--epochs</code></td>
+<td>int</td>
+<td>100</td>
+<td>Number of training epochs.</td>
+</tr>
+<tr>
+<td><code>--lr</code></td>
+<td>float</td>
+<td>0.0002</td>
+<td>Learning rate for the optimizers.</td>
+</tr>
+<tr>
+<td><code>--content_loss</code></td>
+<td>float</td>
+<td>0.001</td>
+<td>Multiplier for the content loss.</td>
+</tr>
+<tr>
+<td><code>--is_l1</code></td>
+<td>bool</td>
+<td>False</td>
+<td>Enable L1 regularization.</td>
+</tr>
+<tr>
+<td><code>--is_l2</code></td>
+<td>bool</td>
+<td>False</td>
+<td>Enable L2 regularization.</td>
+</tr>
+<tr>
+<td><code>--is_elastic_net</code></td>
+<td>bool</td>
+<td>False</td>
+<td>Enable Elastic Net regularization.</td>
+</tr>
+<tr>
+<td><code>--is_lr_scheduler</code></td>
+<td>bool</td>
+<td>False</td>
+<td>Activate a learning rate scheduler.</td>
+</tr>
+<tr>
+<td><code>--is_weight_init</code></td>
+<td>bool</td>
+<td>False</td>
+<td>Apply weight initialization.</td>
+</tr>
+<tr>
+<td><code>--is_weight_clip</code></td>
+<td>float</td>
+<td>0.01</td>
+<td>Apply weight clipping in netG.</td>
+</tr>
+<tr>
+<td><code>--is_display</code></td>
+<td>bool</td>
+<td>False</td>
+<td>Display detailed loss information.</td>
+</tr>
+<tr>
+<td><code>--device</code></td>
+<td>str</td>
+<td>"mps"</td>
+<td>Set the computation device.</td>
+</tr>
+<tr>
+<td><code>--adam</code></td>
+<td>bool</td>
+<td>True</td>
+<td>Use Adam optimizer.</td>
+</tr>
+<tr>
+<td><code>--SGD</code></td>
+<td>bool</td>
+<td>False</td>
+<td>Use SGD optimizer.</td>
+</tr>
+<tr>
+<td><code>--beta1</code></td>
+<td>float</td>
+<td>0.5</td>
+<td>Beta1 hyperparameter for Adam optimizer.</td>
+</tr>
+<tr>
+<td><code>--train</code></td>
+<td>action</td>
+<td>-</td>
+<td>Flag to start training the model.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="example-command-to-run-training">Example Command to Run Training</h3>
+<pre><code class="language-python">python train.py --train --epochs 100 --lr 0.0002 --content_loss 0.001 --is_l1 False --is_l2 False --is_elastic_net False --is_lr_scheduler False --is_weight_init False --is_display True --device mps --adam True --SGD False --beta1 0.5
+</code></pre>
+<h4 id="training-the-model">Training the Model</h4>
+<pre><code class="language-python">trainer = Trainer(
+    epochs=100,                # Number of epochs to train the model
+    lr=0.0002,                 # Learning rate for optimizer
+    content_loss=0.1,          # Weight for content loss in the loss calculation
+    device='cuda',             # Computation device ('cuda', 'mps', 'cpu')
+    adam=True,                 # Use Adam optimizer; set to False to use SGD if implemented
+    SGD=False,                 # Use Stochastic Gradient Descent optimizer; typically False if Adam is True
+    beta1=0.5,                 # Beta1 parameter for Adam optimizer
+    is_l1=False,               # Enable L1 regularization
+    is_l2=False,               # Enable L2 regularization
+    is_elastic_net=False,      # Enable Elastic Net regularization (combination of L1 and L2)
+    is_lr_scheduler=False,     # Enable a learning rate scheduler
+    is_weight_init=False,      # Enable custom weight initialization for the models
+    is_weight_clip=False,      # Enable weight clipping within the training loop; use a float value for clip magnitude if True
+    is_display=True            # Display training progress and statistics
+)
+
+# Start training
+trainer.train()
+</code></pre>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../discriminator/" class="btn btn-neutral float-left" title="Discriminator"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../Charts/" class="btn btn-neutral float-right" title="Charts">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../discriminator/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../Charts/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

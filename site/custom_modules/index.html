@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Custom Modules - Super-Resolution Generative Adversarial Networks</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../assets/_mkdocstrings.css" rel="stylesheet" />
+        <link href="../css/custom.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Custom Modules";
+        var mkdocs_page_input_path = "custom_modules.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Super-Resolution Generative Adversarial Networks
+        </a>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../dataloader/">DataLoader</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../netD_helpers/">netD_helpers</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../netG_helpers/">netG_helpers</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../generator/">Generator</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../discriminator/">Discriminator</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../trainer/">Trainer</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../Charts/">Charts</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../Inference/">Inference</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../cli/">CLI</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="./">Custom Modules</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#initializing-data-loader">Initializing Data Loader</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#to-details-about-dataset">To details about dataset</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#training-the-model">Training the Model</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#training-performances">Training Performances</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#testing-the-model">Testing the Model</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#performing-inference">Performing Inference</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#performing-inference-batch">Performing Inference - batch</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Super-Resolution Generative Adversarial Networks</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Custom Modules</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h3 id="custom-modules-initialization">Custom Modules Initialization</h3>
+<p>Custom modules such as <code>Loader</code>, <code>Trainer</code>, <code>Test</code>, and <code>Inference</code> can be initialized and used as follows:</p>
+<h4 id="initializing-data-loader">Initializing Data Loader</h4>
+<pre><code class="language-python">loader = Loader(image_path=&quot;path/to/dataset&quot;, batch_size=32, image_size=128)
+loader.unzip_folder()
+loader.create_dataloader()
+</code></pre>
+<h5 id="to-details-about-dataset">To details about dataset</h5>
+<pre><code class="language-python">print(loader.details_dataset())   # It will give a CSV file about dataset
+loader.display_images()           # It will display the images from dataset
+</code></pre>
+<h4 id="training-the-model">Training the Model</h4>
+<pre><code class="language-python">trainer = Trainer(
+    epochs=100,                # Number of epochs to train the model
+    lr=0.0002,                 # Learning rate for optimizer
+    content_loss=0.1,          # Weight for content loss in the loss calculation
+    device='cuda',             # Computation device ('cuda', 'mps', 'cpu')
+    adam=True,                 # Use Adam optimizer; set to False to use SGD if implemented
+    SGD=False,                 # Use Stochastic Gradient Descent optimizer; typically False if Adam is True
+    beta1=0.5,                 # Beta1 parameter for Adam optimizer
+    is_l1=False,               # Enable L1 regularization
+    is_l2=False,               # Enable L2 regularization
+    is_elastic_net=False,      # Enable Elastic Net regularization (combination of L1 and L2)
+    is_lr_scheduler=False,     # Enable a learning rate scheduler
+    is_weight_init=False,      # Enable custom weight initialization for the models
+    is_weight_clip=False,      # Enable weight clipping within the training loop; use a float value for clip magnitude if True
+    is_display=True            # Display training progress and statistics
+)
+
+# Start training
+trainer.train()
+</code></pre>
+<h5 id="training-performances">Training Performances</h5>
+<pre><code class="language-python">print(trainer.plot_history())    # It will plot the netD and netG losses for each epochs
+</code></pre>
+<h4 id="testing-the-model">Testing the Model</h4>
+<pre><code class="language-python">test = Test(device=&quot;cuda&quot;, model=&quot;path/to/model.pth&quot;) # use mps, cpu
+test.plot()
+</code></pre>
+<h4 id="performing-inference">Performing Inference</h4>
+<pre><code class="language-python">inference = Inference(image=&quot;path/to/image.jpg&quot;, model=&quot;path/to/model.pth&quot;)
+inference.srgan_single()
+</code></pre>
+<h4 id="performing-inference-batch">Performing Inference - batch</h4>
+<pre><code class="language-python">inference = Inference(model=&quot;path/to/model.pth&quot;)
+inference.srgan_batch()
+</code></pre>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../cli/" class="btn btn-neutral float-left" title="CLI"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../cli/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
