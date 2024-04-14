@@ -107,7 +107,7 @@ class Test:
                         self.best_model = torch.load(model_path)
                         self.best_model = self.best_model["netG"]
 
-                return self.best_model
+            return self.best_model
         else:
             raise Exception("Best models not found".capitalize())
 

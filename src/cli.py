@@ -1,5 +1,6 @@
 import sys
 import os
+import yaml
 import argparse
 
 sys.path.append("src/")
@@ -7,6 +8,31 @@ sys.path.append("src/")
 from dataloader import Loader
 from trainer import Trainer
 from charts import Test
+
+
+def saved_params(**kwargs):
+    """
+    Saves provided parameters to a YAML file. This function takes any number of keyword arguments and writes them
+    to a YAML file, making it useful for saving configuration settings or model parameters after training.
+
+    The data is saved in a human-readable format, which can be easily loaded later for review or reuse.
+
+    Parameters:
+        **kwargs (dict): Arbitrary keyword arguments that represent the parameters to be saved. This could include
+                         model hyperparameters, training settings, or any other configuration details.
+
+    Side Effects:
+        Writes to a file named 'trained_params.yml' in the current working directory. If the file already exists,
+        it will be overwritten.
+
+    Raises:
+        IOError: If the file could not be opened, written, or closed due to I/O errors.
+
+    Example Usage:
+        saved_params(learning_rate=0.001, epochs=100, optimizer='Adam')
+    """
+    with open("./trained_params.yml", "w") as file:
+        yaml.safe_dump(kwargs, file, default_flow_style=False)
 
 
 def cli():
@@ -153,7 +179,7 @@ def cli():
             lr=args.lr,
             content_loss=args.content_loss,
             device=args.device,
-            display=args.device,
+            display=args.is_display,
             adam=args.adam,
             SGD=args.SGD,
             beta1=args.beta1,
@@ -166,6 +192,36 @@ def cli():
         )
 
         trainer.train()
+
+        try:
+            params = {
+                "dataloader": {
+                    "batch_size": args.batch_size,
+                    "image_size": args.image_size,
+                    "is_sub_samples": args.is_sub_samples,
+                },
+                "trainer": {
+                    "epochs": args.epochs,
+                    "lr": args.lr,
+                    "content_loss": args.content_loss,
+                    "device": args.device,
+                    "display": args.is_display,
+                    "adam": args.adam,
+                    "SGD": args.SGD,
+                    "beta1": args.beta1,
+                    "is_l1": args.is_l1,
+                    "is_l2": args.is_l2,
+                    "is_elastic_net": args.is_elastic_net,
+                    "is_lr_scheduler": args.is_lr_scheduler,
+                    "is_weight_clip": args.is_weight_clip,
+                    "is_weight_init": args.is_weight_init,
+                },
+            }
+
+            saved_params(params=params)
+
+        except Exception as e:
+            print("Exception occurred: {}".format(e))
 
     elif args.test:
         test = Test(device=args.device, model=args.model)

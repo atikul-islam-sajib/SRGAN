@@ -1,0 +1,20 @@
+params:
+  dataloader:
+    batch_size: 1
+    image_size: 128
+    is_sub_samples: true
+  trainer:
+    SGD: false
+    adam: true
+    beta1: 0.5
+    content_loss: 0.001
+    device: mps
+    display: true
+    epochs: 1
+    is_elastic_net: false
+    is_l1: false
+    is_l2: false
+    is_lr_scheduler: false
+    is_weight_clip: 0.01
+    is_weight_init: false
+    lr: 0.0002
