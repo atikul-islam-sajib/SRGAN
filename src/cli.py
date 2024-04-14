@@ -5,13 +5,46 @@ import argparse
 sys.path.append("src/")
 
 from dataloader import Loader
-from generator import Generator
-from discriminator import Discriminator
 from trainer import Trainer
 from charts import Test
 
 
 def cli():
+    """
+    Command-line interface function for managing the data loading, training, and testing processes for a Super-Resolution
+    GAN (SR-GAN). It parses command-line arguments to configure and initiate various operational modes including data
+    preparation, model training, and model testing.
+
+    The CLI provides options to specify image paths, training parameters, and whether to train or test the model,
+    along with settings for optimizer types, learning rates, loss types, and device configuration.
+
+    Command-Line Arguments:
+        --image_path (str): Path to the image dataset.
+        --batch_size (int): Number of images per batch during training.
+        --image_size (int): Size to which the images will be resized.
+        --is_sub_samples (bool): Whether to create subsamples of the dataset.
+        --epochs (int): Number of training epochs.
+        --lr (float): Learning rate for the optimizer.
+        --content_loss (float): Weight of the content loss in the loss function.
+        --is_l1 (bool): Whether to use L1 loss.
+        --is_l2 (bool): Whether to use L2 loss.
+        --is_elastic_net (bool): Whether to use Elastic Net loss.
+        --is_lr_scheduler (bool): Whether to apply a learning rate scheduler.
+        --is_weight_init (bool): Whether to initialize weights before training.
+        --is_weight_clip (float): Magnitude of weight clipping in netG.
+        --is_display (bool): Whether to display detailed training progress.
+        --device (str): Computation device to use ('cuda', 'mps', 'cpu').
+        --adam (bool): Whether to use the Adam optimizer.
+        --SGD (bool): Whether to use Stochastic Gradient Descent.
+        --beta1 (float): Beta1 hyperparameter for Adam optimizer.
+        --train (action): Flag to indicate training mode.
+        --model (str): Path to a saved model for testing.
+        --test (action): Flag to indicate testing mode.
+
+    Raises:
+        Exception: Handles general exceptions related to file paths or operational issues, providing a message
+                   indicating the nature of the error.
+    """
     parser = argparse.ArgumentParser(description="Data Loader for SR-GAN".title())
     parser.add_argument(
         "--image_path", type=str, help="Path to the image for SR-GAN".capitalize()
