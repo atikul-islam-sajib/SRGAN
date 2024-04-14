@@ -477,7 +477,7 @@ class Trainer:
         if self.is_display:
             print(
                 "Epochs - [{}/{}] - train_netG_loss: {:.5f} - train_netD_loss: {:.5f} - test_loss: {:.5f}".format(
-                    kwargs["epoch"] + 1,
+                    kwargs["epoch"],
                     kwargs["epochs"],
                     np.mean(kwargs["netG_loss"]),
                     np.mean(kwargs["netD_loss"]),
@@ -558,6 +558,9 @@ class Trainer:
             else:
                 self.save_training_images(epoch=epoch + 1)
 
+                self.history["netG"].append(np.mean(self.netG_loss))
+                self.history["netD"].append(np.mean(self.netD_loss))
+
             finally:
                 self.show_progress(
                     epoch=epoch + 1,
@@ -571,9 +574,6 @@ class Trainer:
                 self.schedulerD.step()
                 self.schedulerG.step()
         try:
-            self.history["netG"].append(np.mean(self.netG_loss))
-            self.history["netD"].append(np.mean(self.netD_loss))
-
             if os.path.exists(MODEL_HISTORY):
                 pd.DataFrame(self.loss_track).to_csv(
                     os.path.join(MODEL_HISTORY, "history.csv")
@@ -705,7 +705,7 @@ if __name__ == "__main__":
             lr=args.lr,
             content_loss=args.content_loss,
             device=args.device,
-            display=args.is_device,
+            display=args.device,
             adam=args.adam,
             SGD=args.SGD,
             beta1=args.beta1,
