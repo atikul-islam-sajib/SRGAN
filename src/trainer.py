@@ -80,6 +80,7 @@ class Trainer:
         is_elastic_net=False,
         is_lr_scheduler=False,
         is_weight_init=False,
+        is_weight_clip=False,
         display=True,
     ):
         """
@@ -113,6 +114,7 @@ class Trainer:
         self.is_elastic_net = is_elastic_net
         self.is_lr_scheduler = is_lr_scheduler
         self.is_weight_init = is_weight_init
+        self.is_weight_clip = is_weight_clip
         self.is_display = display
 
         try:
@@ -147,6 +149,7 @@ class Trainer:
             self.criterion_content = init["criterion_loss"]
 
             self.infinity = float("inf")
+            self.clip_value = 0.01
             self.loss_track = {"netG": list(), "netD": list()}
             self.history = {"netG": list(), "netD": list()}
 
@@ -307,6 +310,11 @@ class Trainer:
                 total_loss += self.elastic_net(self.netD)
 
             total_loss.backward()
+
+            if self.is_weight_clip:
+                for params in self.netD.parameters():
+                    params.data.clamp_(-self.clip_value, self.clip_value)
+
             self.optimizerD.step()
 
         except KeyError as e:
@@ -664,6 +672,12 @@ if __name__ == "__main__":
         help="Use weight initialization".capitalize(),
     )
     parser.add_argument(
+        "--is_weight_clip",
+        type=float,
+        default=0.01,
+        help="Use weight Clipping in netG".capitalize(),
+    )
+    parser.add_argument(
         "--is_display",
         type=bool,
         default=False,
@@ -699,6 +713,7 @@ if __name__ == "__main__":
             is_l2=args.is_l2,
             is_elastic_net=args.is_elastic_net,
             is_lr_scheduler=args.is_lr_scheduler,
+            is_weight_clip=args.is_weight_clip,
             is_weight_init=args.is_weight_init,
         )
 
