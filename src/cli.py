@@ -132,8 +132,8 @@ def cli():
     )
     parser.add_argument(
         "--is_weight_clip",
-        type=float,
-        default=0.01,
+        type=bool,
+        default=False,
         help="Use weight Clipping in netG".capitalize(),
     )
     parser.add_argument(
