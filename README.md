@@ -98,6 +98,10 @@ For detailed documentation on the dataset visit the [Dataset - Kaggle](https://w
 
 For detailed documentation on the implementation and usage, visit the -> [SRGAN Documentation](https://atikul-islam-sajib.github.io/SRGAN-deploy/).
 
+### Model History
+
+For detailed documentation on the implementation and usage, visit the -> [SRGAN Model History](https://github.com/atikul-islam-sajib/SRGAN/blob/main/checkpoints/model_history/history.csv).
+
 ### Command Line Interface
 
 The project is controlled via a command line interface (CLI) which allows for running different operational modes such as training, testing, and inference.
