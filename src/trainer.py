@@ -558,6 +558,10 @@ class Trainer:
                     netD_loss=np.array(self.netD_loss).mean(),
                     test_loss=np.array(self.test_loss).mean(),
                 )
+
+            if self.is_lr_scheduler:
+                self.schedulerD.step()
+                self.schedulerG.step()
         try:
             self.history["netG"].append(np.mean(self.netG_loss))
             self.history["netD"].append(np.mean(self.netD_loss))
