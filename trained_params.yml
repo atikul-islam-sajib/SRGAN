@@ -10,11 +10,11 @@ params:
     content_loss: 0.001
     device: mps
     display: true
-    epochs: 1
+    epochs: 100
     is_elastic_net: false
     is_l1: false
     is_l2: false
     is_lr_scheduler: false
-    is_weight_clip: 0.01
+    is_weight_clip: false
     is_weight_init: false
     lr: 0.0002

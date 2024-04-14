@@ -1,5 +1,7 @@
 # Super-Resolution GAN (SR-GAN) Project
 
+<img src="https://raw.githubusercontent.com/atikul-islam-sajib/Research-Assistant-Work-/main/IMG_9292.jpg" alt="AC-GAN - Medical Image Dataset Generator: Generated Image with labels">
+
 This project provides a complete framework for training and testing a Super-Resolution Generative Adversarial Network (SR-GAN). It includes functionality for data preparation, model training, testing, and inference to enhance low-resolution images to high-resolution.
 
 <img src="https://media.springernature.com/full/springer-static/image/art%3A10.1038%2Fs41524-022-00749-z/MediaObjects/41524_2022_749_Fig1_HTML.png" alt="AC-GAN - Medical Image Dataset Generator: Generated Image with labels">
@@ -128,12 +130,6 @@ The project is controlled via a command line interface (CLI) which allows for ru
 | `--batch`         | Flag for batch image inference               | action | N/A     |
 
 ### CLI Command Examples
-
-To provide a comprehensive table for the CLI command examples with variations for different compute devices (CUDA, MPS, CPU), we can expand the table to include commands for each device. This way, users can easily find the command suitable for their system's configuration.
-
-### CLI Command Examples
-
-Here’s the expanded table with commands tailored for CUDA, MPS, and CPU:
 
 | Task                     | CUDA Command                                                                                                              | MPS Command                                                                                                              | CPU Command                                                                                                              |
 |--------------------------|---------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
