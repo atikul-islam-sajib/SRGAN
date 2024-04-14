@@ -300,6 +300,12 @@ class Trainer:
 
             total_loss = 0.5 * (hr_loss + fake_loss)
 
+            if self.is_l2:
+                total_loss += self.l1(self.netD)
+
+            if self.is_elastic_net:
+                total_loss += self.elastic_net(self.netD)
+
             total_loss.backward()
             self.optimizerD.step()
 
@@ -350,6 +356,12 @@ class Trainer:
 
             content_loss_vgg = torch.abs(real_features - fake_features).mean()
             total_loss = self.content_loss * adversarial_loss + content_loss_vgg
+
+            if self.is_l2:
+                total_loss += self.l1(self.netG)
+
+            if self.is_elastic_net:
+                total_loss += self.elastic_net(self.netG)
 
             total_loss.backward()
             self.optimizerG.step()
