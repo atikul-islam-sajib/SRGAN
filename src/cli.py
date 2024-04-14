@@ -8,6 +8,7 @@ sys.path.append("src/")
 from dataloader import Loader
 from trainer import Trainer
 from charts import Test
+from inference import Inference
 
 
 def saved_params(**kwargs):
@@ -160,6 +161,18 @@ def cli():
     parser.add_argument(
         "--test", action="store_true", help="Test the model".capitalize()
     )
+    parser.add_argument(
+        "--image",
+        type=str,
+        default=None,
+        help="Path to the image for SRGAN".capitalize(),
+    )
+    parser.add_argument(
+        "--single", action="store_true", help="Single image inference".capitalize()
+    )
+    parser.add_argument(
+        "--batch", action="store_true", help="Batch image inference".capitalize()
+    )
 
     args = parser.parse_args()
 
@@ -226,6 +239,14 @@ def cli():
     elif args.test:
         test = Test(device=args.device, model=args.model)
         test.plot()
+
+    elif args.single:
+        inference = Inference(image=args.image, model=args.model, device=args.device)
+        inference.srgan_single()
+
+    elif args.batch:
+        inference = Inference(image=args.image, model=args.model, device=args.device)
+        inference.srgan_batch()
 
 
 if __name__ == "__main__":
