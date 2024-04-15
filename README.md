@@ -98,6 +98,14 @@ For detailed documentation on the dataset visit the [Dataset - Kaggle](https://w
 
 For detailed documentation on the implementation and usage, visit the -> [SRGAN Documentation](https://atikul-islam-sajib.github.io/SRGAN-deploy/).
 
+### User Guide Notebook - CLI
+
+For detailed documentation on the implementation and usage, visit the -> [SRGAN Notebook - CLI](https://github.com/atikul-islam-sajib/SRGAN/blob/main/research/notebooks/ModelTrain-CLI.ipynb).
+
+### User Guide Notebook - Custom Modules
+
+For detailed documentation on the implementation and usage, visit the -> [SRGAN Notebook - CM](https://github.com/atikul-islam-sajib/SRGAN/blob/main/research/notebooks/ModelTrain-Modules.ipynb).
+
 ### Model History
 
 For detailed documentation on the implementation and usage, visit the -> [SRGAN Model History](https://github.com/atikul-islam-sajib/SRGAN/blob/main/checkpoints/model_history/history.csv).
