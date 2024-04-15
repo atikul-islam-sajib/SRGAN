@@ -24,7 +24,7 @@ from config import (
     MODEL_HISTORY,
 )
 from helpers import helper
-from utils import weight_init, dump, load
+from utils import weight_init, dump, load, clean
 
 import warnings
 
@@ -152,6 +152,9 @@ class Trainer:
             self.clip_value = 0.01
             self.loss_track = {"netG": list(), "netD": list()}
             self.history = {"netG": list(), "netD": list()}
+
+        finally:
+            clean()
 
     def l1(self, model):
         """
