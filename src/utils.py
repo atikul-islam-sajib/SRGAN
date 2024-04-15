@@ -1,8 +1,13 @@
+import sys
 import os
 import joblib
 import yaml
 import torch
 import torch.nn as nn
+
+sys.path.append("src/")
+
+from config import BEST_MODELS, TRAIN_IMAGES
 
 
 def dump(value, filename):
@@ -46,5 +51,14 @@ def device_init(device="mps"):
         return torch.device("cpu")
 
 
+def clean_helpers(**kwargs):
+    for file in os.listdir(kwargs["path"]):
+        os.remove(os.path.join(kwargs["path"], file))
+
+
 def clean():
-    pass
+    if (os.path.exists(BEST_MODELS)) and (os.path.exists(TRAIN_IMAGES)):
+        for path in [BEST_MODELS, TRAIN_IMAGES]:
+            clean_helpers(path=path)
+    else:
+        raise FileExistsError("The directory should be created".capitalize())
